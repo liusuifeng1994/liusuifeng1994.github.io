@@ -82,30 +82,30 @@
 <meta name="description" content="源码下载官网https://github.com/apache/spark可以直接下载（本文最新的是3.0），不过推荐fork到自己的github中，然后再clone到本地，方便以后注释可以push上去。 源码编译因为源码比较庞大，并且需要先进行编译安装依赖环境和生成一些其他的依赖源码，官网编译文档，http://spark.apache.org/docs/latest/building-spar">
 <meta name="keywords" content="spark">
 <meta property="og:type" content="article">
-<meta property="og:title" content="一.spark源码环境搭建">
-<meta property="og:url" content="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/一. spark源码环境搭建/index.html">
+<meta property="og:title" content="spark 源码阅读环境搭建">
+<meta property="og:url" content="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/index.html">
 <meta property="og:site_name" content="Liusuifeng&#39;s Blog">
 <meta property="og:description" content="源码下载官网https://github.com/apache/spark可以直接下载（本文最新的是3.0），不过推荐fork到自己的github中，然后再clone到本地，方便以后注释可以push上去。 源码编译因为源码比较庞大，并且需要先进行编译安装依赖环境和生成一些其他的依赖源码，官网编译文档，http://spark.apache.org/docs/latest/building-spar">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="https://github.com/_posts/media/15488565064671/15489071415009.jpg">
-<meta property="og:image" content="https://github.com/_posts/media/15488565064671/15511673246049.jpg">
-<meta property="og:image" content="https://github.com/_posts/media/15488565064671/15511716992055.jpg">
-<meta property="og:image" content="https://github.com/_posts/media/15488565064671/15511688084057.jpg">
-<meta property="og:image" content="https://github.com/_posts/media/15488565064671/15511734004612.jpg">
-<meta property="og:image" content="https://github.com/_posts/media/15488565064671/15511737245037.jpg">
-<meta property="og:image" content="https://github.com/_posts/media/15488565064671/15511744085856.jpg">
-<meta property="og:image" content="https://github.com/_posts/media/15488565064671/15511786721385.jpg">
-<meta property="og:image" content="https://github.com/_posts/media/15488565064671/15511892095820.jpg">
-<meta property="og:image" content="https://github.com/_posts/media/15488565064671/15511892995170.jpg">
-<meta property="og:image" content="https://github.com/_posts/media/15488565064671/15511898552941.jpg">
-<meta property="og:image" content="https://github.com/_posts/media/15488565064671/15511900477440.jpg">
-<meta property="og:image" content="https://github.com/_posts/media/15488565064671/15511904174896.jpg">
-<meta property="og:image" content="https://github.com/_posts/media/15488565064671/15512586046152.jpg">
-<meta property="og:updated_time" content="2019-02-27T09:36:35.262Z">
+<meta property="og:image" content="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15489071415009.jpg">
+<meta property="og:image" content="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511673246049.jpg">
+<meta property="og:image" content="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511716992055.jpg">
+<meta property="og:image" content="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511688084057.jpg">
+<meta property="og:image" content="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511734004612.jpg">
+<meta property="og:image" content="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511737245037.jpg">
+<meta property="og:image" content="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511744085856.jpg">
+<meta property="og:image" content="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511786721385.jpg">
+<meta property="og:image" content="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511892095820.jpg">
+<meta property="og:image" content="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511892995170.jpg">
+<meta property="og:image" content="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511898552941.jpg">
+<meta property="og:image" content="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511900477440.jpg">
+<meta property="og:image" content="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511904174896.jpg">
+<meta property="og:image" content="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15512586046152.jpg">
+<meta property="og:updated_time" content="2019-02-27T10:12:07.144Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="一.spark源码环境搭建">
+<meta name="twitter:title" content="spark 源码阅读环境搭建">
 <meta name="twitter:description" content="源码下载官网https://github.com/apache/spark可以直接下载（本文最新的是3.0），不过推荐fork到自己的github中，然后再clone到本地，方便以后注释可以push上去。 源码编译因为源码比较庞大，并且需要先进行编译安装依赖环境和生成一些其他的依赖源码，官网编译文档，http://spark.apache.org/docs/latest/building-spar">
-<meta name="twitter:image" content="https://github.com/_posts/media/15488565064671/15489071415009.jpg">
+<meta name="twitter:image" content="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15489071415009.jpg">
 
 
 
@@ -135,13 +135,13 @@
 
 
 
-  <link rel="canonical" href="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/一. spark源码环境搭建/">
+  <link rel="canonical" href="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/">
 
 
 
 
 
-  <title>一.spark源码环境搭建 | Liusuifeng's Blog</title>
+  <title>spark 源码阅读环境搭建 | Liusuifeng's Blog</title>
   
 
 
@@ -248,7 +248,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/一. spark源码环境搭建/">
+    <link itemprop="mainEntityOfPage" href="https://github.com/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Liusuifeng">
@@ -265,7 +265,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">一.spark源码环境搭建</h1>
+          <h1 class="post-title" itemprop="name headline">spark 源码阅读环境搭建</h1>
         
 
         <div class="post-meta">
@@ -277,7 +277,7 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-02-27T15:02:33+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-02-27T17:59:02+08:00">
                 2019-02-27
               </time>
             
@@ -316,19 +316,19 @@
 
       
         <h1 id="源码下载"><a href="#源码下载" class="headerlink" title="源码下载"></a>源码下载</h1><p>官网<a href="https://github.com/apache/spark可以直接下载（本文最新的是3.0），不过推荐fork到自己的github中，然后再clone到本地，方便以后注释可以push上去。">https://github.com/apache/spark可以直接下载（本文最新的是3.0），不过推荐fork到自己的github中，然后再clone到本地，方便以后注释可以push上去。</a></p>
-<h1 id="源码编译"><a href="#源码编译" class="headerlink" title="源码编译"></a>源码编译</h1><p>因为源码比较庞大，并且需要先进行编译安装依赖环境和生成一些其他的依赖源码，官网编译文档，<a href="http://spark.apache.org/docs/latest/building-spark.html#buildmvn。" target="_blank" rel="noopener">http://spark.apache.org/docs/latest/building-spark.html#buildmvn。</a><br>因为基本都是通过IntelliJ 阅读源码，所以只要运行<br><code>./build/mvn -T 4 -DskipTests clean package</code><br>其中T是线程数，等待编译完成即刻，大概10多分钟左右。<br><img src="/_posts/media/15488565064671/15489071415009.jpg" alt=""><br><strong>备注：</strong><br>1.编译了三次，前2次都是卡在spark-mllib-local_2.12-3.0.0-SNAPSHOT-test-sources.jar就不动了，后面把前面编译-T 多线程参数去掉，重新编译就成功了，具体原因我也不知道。<br>2.其实不需要提前安装scala，maven，jdk等这些，spark编译包会自动根据pom文件中指定的版本安装。<br>3.完成后备忘了运行<code>./bin/spark-shell</code>测试一下是否成功了哈。</p>
-<h1 id="源码导入intellij"><a href="#源码导入intellij" class="headerlink" title="源码导入intellij"></a>源码导入intellij</h1><p>maven工程的打开比较方便<br>Menu -&gt; File -&gt; Open -&gt; {spark dir}/pom.xml -&gt; Open as Project<br><img src="/_posts/media/15488565064671/15511673246049.jpg" alt=""></p>
+<h1 id="源码编译"><a href="#源码编译" class="headerlink" title="源码编译"></a>源码编译</h1><p>因为源码比较庞大，并且需要先进行编译安装依赖环境和生成一些其他的依赖源码，官网编译文档，<a href="http://spark.apache.org/docs/latest/building-spark.html#buildmvn。" target="_blank" rel="noopener">http://spark.apache.org/docs/latest/building-spark.html#buildmvn。</a><br>因为基本都是通过IntelliJ 阅读源码，所以只要运行<br><code>./build/mvn -T 4 -DskipTests clean package</code><br>其中T是线程数，等待编译完成即刻，大概10多分钟左右。<br><img src="/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15489071415009.jpg" alt="logo"><br><strong>备注：</strong><br>1.编译了三次，前2次都是卡在spark-mllib-local_2.12-3.0.0-SNAPSHOT-test-sources.jar就不动了，后面把前面编译-T 多线程参数去掉，重新编译就成功了，具体原因我也不知道。<br>2.其实不需要提前安装scala，maven，jdk等这些，spark编译包会自动根据pom文件中指定的版本安装。<br>3.完成后备忘了运行<code>./bin/spark-shell</code>测试一下是否成功了哈。</p>
+<h1 id="源码导入intellij"><a href="#源码导入intellij" class="headerlink" title="源码导入intellij"></a>源码导入intellij</h1><p>maven工程的打开比较方便<br>Menu -&gt; File -&gt; Open -&gt; {spark dir}/pom.xml -&gt; Open as Project<br><img src="/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511673246049.jpg" alt="logo"></p>
 <h1 id="运行测试程序"><a href="#运行测试程序" class="headerlink" title="运行测试程序"></a>运行测试程序</h1><p>spark中带有各类语言测试程序，在examples文件中，本文以java语言最经典的wordCount程序为例。</p>
-<h2 id="命令行运行"><a href="#命令行运行" class="headerlink" title="命令行运行"></a>命令行运行</h2><p>官网的说明是use bin/run-example <class> [params] in the top-level Spark directory，即在spark的根目录下运行bin/run-example。然后系统会自动调用spark-submit脚本运行任务。如<br><code>./bin/run-example JavaWordCount /Users/liuzebin/open_source_project/spark/examples/src/main/resources/people.txt</code><br><img src="/_posts/media/15488565064671/15511716992055.jpg" alt=""></class></p>
+<h2 id="命令行运行"><a href="#命令行运行" class="headerlink" title="命令行运行"></a>命令行运行</h2><p>官网的说明是use bin/run-example <class> [params] in the top-level Spark directory，即在spark的根目录下运行bin/run-example。然后系统会自动调用spark-submit脚本运行任务。如<br><code>./bin/run-example JavaWordCount /Users/liuzebin/open_source_project/spark/examples/src/main/resources/people.txt</code><br><img src="/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511716992055.jpg" alt="logo"></class></p>
 <h2 id="idea中直接运行"><a href="#idea中直接运行" class="headerlink" title="idea中直接运行"></a>idea中直接运行</h2><h3 id="配置jdk"><a href="#配置jdk" class="headerlink" title="配置jdk"></a>配置jdk</h3><p>打开File–&gt;Project Structure–&gt;Platform settings–&gt;SDKS选择Java的安装路径即可Apply即可。<br>我在mac上安装的jdk11，默认路径为/Library/Java/JavaVirtualMachines/jdk-11.0.1.jdk/Contents/Home</p>
-<h3 id="main运行"><a href="#main运行" class="headerlink" title="main运行"></a>main运行</h3><p> 点击main函数的运行，出现了以下error。<br><img src="/_posts/media/15488565064671/15511688084057.jpg" alt=""><br>明明jdk11中有这个包呀，Google和百度了半天也没收获。最后无奈又下载了一个jdk8，因为pom文件中的java-version为1.8，然后真的没有出现这个问题啦。</p>
-<h3 id="配置参数"><a href="#配置参数" class="headerlink" title="配置参数"></a>配置参数</h3><p>因为wordCount需要指定文件名，故在run-edit Configurations配置<br><img src="/_posts/media/15488565064671/15511734004612.jpg" alt=""><br><img src="/_posts/media/15488565064671/15511737245037.jpg" alt=""><br>其中<br>VM options: -Dspark.master=local<br>Program arguments:/Users/liuzebin/open_source_project/spark/examples/src/main/resources/people.txt<br>第一个参数为指定spark为local运行模式，第二个为wordcount程序的参数，即需要统计文件的目录。</p>
-<h3 id="异常"><a href="#异常" class="headerlink" title="异常"></a>异常</h3><p><img src="/_posts/media/15488565064671/15511744085856.jpg" alt=""><br>这个应该找不到类的引用，百度一下是因为pom文件中的<scope>private</scope>,<br>把examples下的pom文件中的<scope>private</scope>改为<scope>compile</scope><br>然后出现以下错误<br><img src="/_posts/media/15488565064671/15511786721385.jpg" alt=""><br>和上面的错误类似，但是examples下的pom文件中的scope已经全改为了compile了呀，然后不知所云。后来发现com.goole这包还是provided，这是因为examples下的pom文件还依赖外部的pom文件，外部文件中的com.google为provided。<br><img src="/_posts/media/15488565064671/15511892095820.jpg" alt=""></p>
-<p><img src="/_posts/media/15488565064671/15511892995170.jpg" alt=""></p>
-<p>然后这问题解决了，又出来新问题，心累哈<br><img src="/_posts/media/15488565064671/15511898552941.jpg" alt=""></p>
-<p>发现最外层的pom中，哎，决定一不做二不休，把pom中的<scope>provided</scope>全替换为<scope>compile</scope><br><img src="/_posts/media/15488565064671/15511900477440.jpg" alt=""><br>最后终于ok啦，输出了大量的info日志，哈哈，开心。<br><img src="/_posts/media/15488565064671/15511904174896.jpg" alt=""></p>
+<h3 id="main运行"><a href="#main运行" class="headerlink" title="main运行"></a>main运行</h3><p> 点击main函数的运行，出现了以下error。<br><img src="/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511688084057.jpg" alt="logo"><br>明明jdk11中有这个包呀，Google和百度了半天也没收获。最后无奈又下载了一个jdk8，因为pom文件中的java-version为1.8，然后真的没有出现这个问题啦。</p>
+<h3 id="配置参数"><a href="#配置参数" class="headerlink" title="配置参数"></a>配置参数</h3><p>因为wordCount需要指定文件名，故在run-edit Configurations配置<br><img src="/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511734004612.jpg" alt="logo"><br><img src="/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511737245037.jpg" alt="logo"><br>其中<br>VM options: -Dspark.master=local<br>Program arguments:/Users/liuzebin/open_source_project/spark/examples/src/main/resources/people.txt<br>第一个参数为指定spark为local运行模式，第二个为wordcount程序的参数，即需要统计文件的目录。</p>
+<h3 id="异常"><a href="#异常" class="headerlink" title="异常"></a>异常</h3><p><img src="/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511744085856.jpg" alt="logo"><br>这个应该找不到类的引用，百度一下是因为pom文件中的<scope>private</scope>,<br>把examples下的pom文件中的<scope>private</scope>改为<scope>compile</scope><br>然后出现以下错误<br><img src="/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511786721385.jpg" alt="logo"><br>和上面的错误类似，但是examples下的pom文件中的scope已经全改为了compile了呀，然后不知所云。后来发现com.goole这包还是provided，这是因为examples下的pom文件还依赖外部的pom文件，外部文件中的com.google为provided。<br><img src="/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511892095820.jpg" alt="logo"></p>
+<p><img src="/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511892995170.jpg" alt="logo"></p>
+<p>然后这问题解决了，又出来新问题，心累哈<br><img src="/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511898552941.jpg" alt="logo"></p>
+<p>发现最外层的pom中，哎，决定一不做二不休，把pom中的<scope>provided</scope>全替换为<scope>compile</scope><br><img src="/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511900477440.jpg" alt="logo"><br>最后终于ok啦，输出了大量的info日志，哈哈，开心。<br><img src="/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15511904174896.jpg" alt="logo"></p>
 <p>java.lang.NoClassDefFoundError 基本都是类导入失败，大概是pom文件中对应类的scope为provided,删除或改为compile即可。</p>
-<h1 id="单步debug"><a href="#单步debug" class="headerlink" title="单步debug"></a>单步debug</h1><p>在程序对应的点打上断点，然后运行debug即刻，然后就可以看到变量的值啦。<br><img src="/_posts/media/15488565064671/15512586046152.jpg" alt=""></p>
+<h1 id="单步debug"><a href="#单步debug" class="headerlink" title="单步debug"></a>单步debug</h1><p>在程序对应的点打上断点，然后运行debug即刻，然后就可以看到变量的值啦。<br><img src="/liusuifeng1994/liusuifeng.github.io/2019/02/27/spark-源码阅读环境搭建/15512586046152.jpg" alt="logo"></p>
 
       
     </div>
@@ -359,15 +359,15 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2019/02/27/一. spark源码环境搭建/" rel="next" title="一.spark源码环境搭建">
+                <i class="fa fa-chevron-left"></i> 一.spark源码环境搭建
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/02/27/spark-源码阅读环境搭建/" rel="prev" title="spark 源码阅读环境搭建">
-                spark 源码阅读环境搭建 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
