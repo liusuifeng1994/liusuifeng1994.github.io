@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="kafka,">
 
 
 
@@ -79,13 +79,24 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="Liusuifeng&#39;s Blog">
-<meta property="og:url" content="https://liusuifeng1994.github.io/index.html">
+<meta name="description" content="Kafka生产者生产者发送消息的简单过程Kafka会将发送消息包装为ProducerRecord对象，ProducerRecord 对象包含了目标主题和要发送的内容，同时还可以指定键和分区。在发送 ProducerRecord 对象前，生产者会先把键和值对象序列化成字节数组，这样它们才能够在网络上传输。接下来，数据会经过拦截器、序列化器和分区器。如果之前已经在ProducerRecord对象里指定">
+<meta name="keywords" content="kafka">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kafka生产者">
+<meta property="og:url" content="https://liusuifeng1994.github.io/Kafka/KaKfa生产者/index.html">
 <meta property="og:site_name" content="Liusuifeng&#39;s Blog">
+<meta property="og:description" content="Kafka生产者生产者发送消息的简单过程Kafka会将发送消息包装为ProducerRecord对象，ProducerRecord 对象包含了目标主题和要发送的内容，同时还可以指定键和分区。在发送 ProducerRecord 对象前，生产者会先把键和值对象序列化成字节数组，这样它们才能够在网络上传输。接下来，数据会经过拦截器、序列化器和分区器。如果之前已经在ProducerRecord对象里指定">
 <meta property="og:locale" content="default">
+<meta property="og:image" content="https://liusuifeng1994.github.io/media/15828633731922.jpg">
+<meta property="og:image" content="https://liusuifeng1994.github.io/media/15828787180589.jpg">
+<meta property="og:image" content="https://liusuifeng1994.github.io/media/15828787308307.jpg">
+<meta property="og:image" content="https://liusuifeng1994.github.io/media/15828801094738.jpg">
+<meta property="og:image" content="https://liusuifeng1994.github.io/media/15828801200328.jpg">
+<meta property="og:updated_time" content="2020-02-28T08:56:50.686Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Liusuifeng&#39;s Blog">
+<meta name="twitter:title" content="kafka生产者">
+<meta name="twitter:description" content="Kafka生产者生产者发送消息的简单过程Kafka会将发送消息包装为ProducerRecord对象，ProducerRecord 对象包含了目标主题和要发送的内容，同时还可以指定键和分区。在发送 ProducerRecord 对象前，生产者会先把键和值对象序列化成字节数组，这样它们才能够在网络上传输。接下来，数据会经过拦截器、序列化器和分区器。如果之前已经在ProducerRecord对象里指定">
+<meta name="twitter:image" content="https://liusuifeng1994.github.io/media/15828633731922.jpg">
 
 
 
@@ -115,13 +126,13 @@
 
 
 
-  <link rel="canonical" href="https://liusuifeng1994.github.io/">
+  <link rel="canonical" href="https://liusuifeng1994.github.io/Kafka/KaKfa生产者/">
 
 
 
 
 
-  <title>Liusuifeng's Blog</title>
+  <title>kafka生产者 | Liusuifeng's Blog</title>
   
 
 
@@ -140,8 +151,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-  page-home">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
@@ -214,275 +224,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://liusuifeng1994.github.io/Kafka/Kafka消费者/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Liusuifeng">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Liusuifeng's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/Kafka/Kafka消费者/" itemprop="url">kafka消费者</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-02-29T13:00:00+08:00">
-                2020-02-29
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Kafka消费者"><a href="#Kafka消费者" class="headerlink" title="Kafka消费者"></a>Kafka消费者</h1><p>##</p>
-<p>广发100 000826</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://liusuifeng1994.github.io/Kafka/Kafka基础与架构/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Liusuifeng">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Liusuifeng's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/Kafka/Kafka基础与架构/" itemprop="url">kafka基础与架构</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-02-28T13:00:00+08:00">
-                2020-02-28
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="Kafka基础与架构"><a href="#Kafka基础与架构" class="headerlink" title="Kafka基础与架构"></a>Kafka基础与架构</h1><h2 id="Kafka角色"><a href="#Kafka角色" class="headerlink" title="Kafka角色"></a>Kafka角色</h2><p><strong>kafka主要角色</strong><br>    消息系统: Kafka和传统的消息系统(也称作消息中间件)都具备系统解稿、冗余存储、流量削峰、缓冲、异步通信、扩展性、可恢复性等功能。与此同时，Kafka还提供了大多数消息系统难以实现的消息顺序性保障及回溯消费的功能<br>    存储系统: Kafka把消息持久化到磁盘，相比于其他基于内存存储的系统而言，有效地降低了数据丢失的风险。也正是得益于Kafka的消息持久化功能和多副本机制，我们可以把Kafka作为长期的数据存储系统来使用，只需要把对应的数据保留策略设置为“永久”或启用主题的日志压缩功能即可。<br>    流式处理平台: Kafka不仅为每个流行的流式处理框架提供了可靠的数据来源，还提供了一个完整的流式处理类库，比如窗口、连接、变换和聚合等各类操作</p>
-<p><strong>特点</strong></p>
-<ul>
-<li>快：单个kafka服务每秒可处理数以千计客户端发来的几百MB数据。</li>
-<li>可扩展性：一个单一集群可作为一个大数据处理中枢，集中处理各种类型业务</li>
-<li>持久化：消息被持久化到磁盘（可处理TB数据级别数据但仍保持极高数据处理效率），并且有备份容错机制</li>
-<li>分布式：着眼于大数据领域，支持分布式，集群可处理每秒百万级别消息</li>
-<li>实时性：生产出的消息可立即被消费者消费</li>
-</ul>
-<h2 id="基本架构"><a href="#基本架构" class="headerlink" title="基本架构"></a>基本架构</h2><p><strong>架构图:</strong><br><img src="/media/15828558282677.jpg" alt="-w676"></p>
-<p><strong>基础组件</strong></p>
-<ul>
-<li>Producer: 生产者，生产者负责创建消息，然后将其投递到Kafka中。</li>
-<li>Consumer: 消费者，消息的接收方。消费者连接到Kafka上并接收消息，进而进行相应的业务逻辑处理 。</li>
-<li>Broker: 服务代理节点，Broker可以简单地看作一个独立的 Kafka服务节点或Kafka服务实例</li>
-<li>Zookeeper: 元数据管理， kafka使用zookeeper来实现动态的集群扩展，不需要更改客户端（producer和consumer）的配置。broker会在zookeeper注册并保持相关的元数据（topic，partition信息等）更新。但是发送给Topic本身的数据是不会发到Zk上的。</li>
-</ul>
-<p><strong>基本概念</strong></p>
-<ul>
-<li>Topic: kafka中的消息是以主题为单位进行归类，生产者负责将消息发送到特定的主题topic，消费者负责订阅主题进行消费。</li>
-<li>Partitions: 主题是一个逻辑上的概念，它可以分成很多的分区。一个分区只属于一个主题，同一个主题下的不同分区的内容是不同，分区在存储层面可以看做是一个可以追加的日志文件，消息在被追加到分区日志文件的时候，会分配一个偏移量offset。offset是消息在分区中的唯一标识，kafka通过offset保证消息在分区中的顺序，offset不跨域分区，kafka保证的是分区有序而不是主题有序。</li>
-<li>Replica: 区分副本，为了提高容灾能力，每个分区的数据可以设置多个副本。副本之间是一主多从的关系，其中leader副本负责处理读写请求，follower副本只负责与leader副本的消息同步，副本处于不同的broker中，当leader副本发送故障，会从follower副本中重新选择新的leader副本对外提供服务。分区中的所有副本统称AR，所有与leader副本保持一定程度同步的副本（包括leader副本）组成ISR。与leader副本同步滞后过多的副本（不包含leader副本）组成OSR(), AR=ISR+OSR。</li>
-<li>LEO: Log End Offset，标志当前日志下一条待写入消息的offst，分区ISR集合的每个副本都会维护自身的LEO。</li>
-<li>HW: 水位线，分区ISR集合中最小的LEO即为分区的HW。消费者只能消费HW之前的消息。<br><img src="/media/15828589601622.jpg" alt="-w646"><br><img src="/media/15828589774544.jpg" alt="-w599"></li>
-</ul>
-<h2 id="基础生产消费"><a href="#基础生产消费" class="headerlink" title="基础生产消费"></a>基础生产消费</h2><p><strong>创建Topic</strong><br><code>bin/kafka-topics.sh --zookeeper localhost: 2181/kafka --create --topic topic-demo --replication-factor 3 --partitions 4</code><br>–create: 创建主题的命令 –zookeeper: 制定Kafka所连接zooKeeper的地址， –topic: 创建主题的名称 –replication-factor: 副本的个数 –partitions: 分区数<br><strong>获取主题信息</strong><br><code>bin/kafka-topics.sh --zookeeper localhost: 2181/kafka --describe --topic topic-demo</code><br><img src="/media/15828594077229.jpg" alt="-w663"><br><strong>消费信息</strong><br>    <code>bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic topic-demo</code><br>    –bootstrap-server: kafka集群<br><strong>生产信息</strong><br>   <code>bin/kafka-console-producer.sh --broker-list localhost:9092 --topic topic-demo</code><br>   –broker-list: kafka集群</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
 
   
 
@@ -512,9 +256,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/Kafka/KaKfa生产者/" itemprop="url">kafka生产者</a></h1>
+          <h1 class="post-title" itemprop="name headline">kafka生产者</h1>
         
 
         <div class="post-meta">
@@ -564,9 +306,7 @@
       
 
       
-        
-          
-            <h1 id="Kafka生产者"><a href="#Kafka生产者" class="headerlink" title="Kafka生产者"></a>Kafka生产者</h1><h2 id="生产者发送消息的简单过程"><a href="#生产者发送消息的简单过程" class="headerlink" title="生产者发送消息的简单过程"></a>生产者发送消息的简单过程</h2><p>Kafka会将发送消息包装为ProducerRecord对象，ProducerRecord 对象包含了目标主题和要发送的内容，同时还可以指定键和分区。在发送 ProducerRecord 对象前，生产者会先把键和值对象序列化成字节数组，这样它们才能够在网络上传输。<br>接下来，数据会经过拦截器、序列化器和分区器。如果之前已经在ProducerRecord对象里指定了分区，那么分区器就不会再做任何事情。如果没有指定分区，分区器会根据ProducerRecord对象的键来选择一个分区，紧接着，这条记录被添加到一个记录批次里，这个批次里的所有消息会被发送到相同的主题和分区上。有一个独立的线程负责把这些记录批次发送到相应的 broke上。<br>服务器在收到这些消息时会返回一个响应。如果消息成功写入 Kafka，就返回一个 RecordMetaData 对象，它包含了主题和分区信息，以及记录在分区里的偏移量。如果写入失败，则会返回一个错误。生产者在收到错误之后会尝试重新发送消息，如果达到指定的重试次数后还没有成功，则直接抛出异常，不再重试。</p>
+        <h1 id="Kafka生产者"><a href="#Kafka生产者" class="headerlink" title="Kafka生产者"></a>Kafka生产者</h1><h2 id="生产者发送消息的简单过程"><a href="#生产者发送消息的简单过程" class="headerlink" title="生产者发送消息的简单过程"></a>生产者发送消息的简单过程</h2><p>Kafka会将发送消息包装为ProducerRecord对象，ProducerRecord 对象包含了目标主题和要发送的内容，同时还可以指定键和分区。在发送 ProducerRecord 对象前，生产者会先把键和值对象序列化成字节数组，这样它们才能够在网络上传输。<br>接下来，数据会经过拦截器、序列化器和分区器。如果之前已经在ProducerRecord对象里指定了分区，那么分区器就不会再做任何事情。如果没有指定分区，分区器会根据ProducerRecord对象的键来选择一个分区，紧接着，这条记录被添加到一个记录批次里，这个批次里的所有消息会被发送到相同的主题和分区上。有一个独立的线程负责把这些记录批次发送到相应的 broke上。<br>服务器在收到这些消息时会返回一个响应。如果消息成功写入 Kafka，就返回一个 RecordMetaData 对象，它包含了主题和分区信息，以及记录在分区里的偏移量。如果写入失败，则会返回一个错误。生产者在收到错误之后会尝试重新发送消息，如果达到指定的重试次数后还没有成功，则直接抛出异常，不再重试。</p>
 <p><img src="/media/15828633731922.jpg" alt=""></p>
 <h2 id="创建生产者"><a href="#创建生产者" class="headerlink" title="创建生产者"></a>创建生产者</h2><h3 id="maven依赖："><a href="#maven依赖：" class="headerlink" title="maven依赖："></a>maven依赖：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.apache.kafka&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;kafka-clients&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;2.2.0&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
 <h3 id="创建生产者-1"><a href="#创建生产者-1" class="headerlink" title="创建生产者"></a>创建生产者</h3><p>对于KafkaProducer而言，它是线程安全的，可以在多线程的环境中复用它。<br>创建 Kafka 生产者时，以下三个属性是必须指定的：</p>
@@ -617,8 +357,6 @@
 <li>其他<br><img src="/media/15828801094738.jpg" alt="-w709"><br><img src="/media/15828801200328.jpg" alt="-w678"></li>
 </ol>
 
-          
-        
       
     </div>
     
@@ -633,290 +371,40 @@
 
     <footer class="post-footer">
       
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://liusuifeng1994.github.io/leetcode/数组/二分法/二分法思路与模版/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Liusuifeng">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Liusuifeng's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/leetcode/数组/二分法/二分法思路与模版/" itemprop="url">二分法思路与模版</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-02-22T13:00:00+08:00">
-                2020-02-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
+        <div class="post-tags">
           
-
+            <a href="/tags/kafka/" rel="tag"># kafka</a>
           
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
         </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="二分法思路与模版"><a href="#二分法思路与模版" class="headerlink" title="二分法思路与模版"></a>二分法思路与模版</h1><h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://leetcode-cn.com/problems/search-insert-position/solution/te-bie-hao-yong-de-er-fen-cha-fa-fa-mo-ban-python-/" target="_blank" rel="noopener">https://leetcode-cn.com/problems/search-insert-position/solution/te-bie-hao-yong-de-er-fen-cha-fa-fa-mo-ban-python-/</a></p>
-<h2 id="使用范围"><a href="#使用范围" class="headerlink" title="使用范围"></a>使用范围</h2><ol>
-<li>顺序存储结构， 通常是数组；</li>
-<li>有序性，待查找的数组有序或者部分有序</li>
-<li>要求时间复杂度低于O(n)，或者直接要求时间复杂度为O(logn)</li>
-</ol>
-<h2 id="基本类型"><a href="#基本类型" class="headerlink" title="基本类型"></a>基本类型</h2><ol>
-<li>在数组中查找符合条件的元素的索引</li>
-<li>在一个有上下界的区间里搜索一个整数</li>
-<li>判别条件是一个函数</li>
-</ol>
-<h2 id="基本思路"><a href="#基本思路" class="headerlink" title="基本思路"></a>基本思路</h2><p>二分法的思路与模板较多，本文主要介绍<strong>基于“排除法”写的二分查找算法</strong></p>
-<ol start="0">
-<li>区间的索引范围是 [0, size)</li>
-<li>while (left &lt; right)<br> 没有=, 退出条件:left = right. 注意：left(right)位置的值可能程序还没有读取到，因此“有可能”需要再对left(right)这个位置的值是否是目标元素的值做一次判断。</li>
-<li>if else, 思考nums[mid]满足什么性质的时候，mid不是解<br> 往往思考什么时候不是解相对比较好想。</li>
-<li>中位数判断，以免死循环<br> mid在右边是闭合,即right=mid：int mid = left + (right - left) / 2<br> mid在左边是闭合,即left=mid：int mid = left + (right - left + 1) / 2</li>
-<li>退出最后检验, “后处理”<br> 退出时, 一定有left == right成立。有时可以直接返回left(right)或者与left相关的数值，有时还须要再做一次判断，判断left 与 right是否是我们需要查找的元素.<br><img src="/media/15824459011900.jpg" alt=""></li>
-</ol>
-<p>##基本模版：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"> public class Solution &#123;</span><br><span class="line">    public int searchInsert(int[] nums, int target) &#123;</span><br><span class="line">        int len = nums.length;</span><br><span class="line">        </span><br><span class="line">        // 有些场景需要对空数组进行单独判断</span><br><span class="line">        if (len == 0) &#123;</span><br><span class="line">            return 0;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        int left = 0;</span><br><span class="line">        int right = len - 1;</span><br><span class="line"></span><br><span class="line">        while (left &lt; right) &#123;</span><br><span class="line">            int mid = left + (right - left) / 2;</span><br><span class="line">            if (XXX) &#123;</span><br><span class="line">              left = mid + 1;</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                right = mid;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return left;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h2 id="常见题目"><a href="#常见题目" class="headerlink" title="常见题目"></a>常见题目</h2><h3 id="一、-在数组中查找符合条件的元素的索引"><a href="#一、-在数组中查找符合条件的元素的索引" class="headerlink" title="一、 在数组中查找符合条件的元素的索引"></a>一、 在数组中查找符合条件的元素的索引</h3><p><img src="/media/15824459216576.jpg" alt="-w788"></p>
-<h3 id="二、在一个有上下界的区间里搜索一个整数"><a href="#二、在一个有上下界的区间里搜索一个整数" class="headerlink" title="二、在一个有上下界的区间里搜索一个整数"></a>二、在一个有上下界的区间里搜索一个整数</h3><p><img src="/media/15824459314884.jpg" alt="-w764"></p>
-<h3 id="三、判别条件是一个函数"><a href="#三、判别条件是一个函数" class="headerlink" title="三、判别条件是一个函数"></a>三、判别条件是一个函数</h3><p><img src="/media/15824459387530.jpg" alt="-w794"></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
       
 
       
       
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
       
 
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://liusuifeng1994.github.io/Spark/Spark源码/spark-源码阅读环境搭建/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Liusuifeng">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Liusuifeng's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/Spark/Spark源码/spark-源码阅读环境搭建/" itemprop="url">spark 源码阅读环境搭建</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
             
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-02-27T17:59:02+08:00">
-                2019-02-27
-              </time>
+              <a href="/leetcode/数组/二分法/二分法思路与模版/" rel="next" title="二分法思路与模版">
+                <i class="fa fa-chevron-left"></i> 二分法思路与模版
+              </a>
             
+          </div>
 
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
             
-
+              <a href="/Kafka/Kafka基础与架构/" rel="prev" title="kafka基础与架构">
+                kafka基础与架构 <i class="fa fa-chevron-right"></i>
+              </a>
             
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
+          </div>
         </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          
-            <h1 id="源码下载"><a href="#源码下载" class="headerlink" title="源码下载"></a>源码下载</h1><p>官网<a href="https://github.com/apache/spark" target="_blank" rel="noopener">https://github.com/apache/spark</a> 可以直接下载（本文最新的是3.0），不过推荐fork到自己的github中，然后再clone到本地，方便以后注释可以push上去。</p>
-<h1 id="源码编译"><a href="#源码编译" class="headerlink" title="源码编译"></a>源码编译</h1><p>因为源码比较庞大，并且需要先进行编译安装依赖环境和生成一些其他的依赖源码，官网编译文档，<a href="http://spark.apache.org/docs/latest/building-spark.html#buildmvn" target="_blank" rel="noopener">http://spark.apache.org/docs/latest/building-spark.html#buildmvn</a><br>因为基本都是通过IntelliJ 阅读源码，所以只要运行<br><code>./build/mvn -T 4 -DskipTests clean package</code><br>其中T是线程数，等待编译完成即刻，大概10多分钟左右。<br><img src="/media/15489071415009.jpg" alt="logo"><br><strong>备注：</strong><br>1.编译了三次，前2次都是卡在spark-mllib-local_2.12-3.0.0-SNAPSHOT-test-sources.jar就不动了，后面把前面编译-T 多线程参数去掉，重新编译就成功了，具体原因我也不知道。<br>2.其实不需要提前安装scala，maven，jdk等这些，spark编译包会自动根据pom文件中指定的版本安装。<br>3.完成后备忘了运行<code>./bin/spark-shell</code>测试一下是否成功了哈。</p>
-<h1 id="源码导入intellij"><a href="#源码导入intellij" class="headerlink" title="源码导入intellij"></a>源码导入intellij</h1><p>maven工程的打开比较方便<br>Menu -&gt; File -&gt; Open -&gt; {spark dir}/pom.xml -&gt; Open as Project<br><img src="/media/15511673246049.jpg" alt="logo"></p>
-<h1 id="运行测试程序"><a href="#运行测试程序" class="headerlink" title="运行测试程序"></a>运行测试程序</h1><p>spark中带有各类语言测试程序，在examples文件中，本文以java语言最经典的wordCount程序为例。</p>
-<h2 id="命令行运行"><a href="#命令行运行" class="headerlink" title="命令行运行"></a>命令行运行</h2><p>官网的说明是use bin/run-example <class> [params] in the top-level Spark directory，即在spark的根目录下运行bin/run-example。然后系统会自动调用spark-submit脚本运行任务。如<br><code>./bin/run-example  JavaWordCount 
-/Users/liuzebin/open_source_project/spark/examples/src/main/resources/people.txt</code><br><img src="/media/15511716992055.jpg" alt="logo"></class></p>
-<h2 id="idea中直接运行"><a href="#idea中直接运行" class="headerlink" title="idea中直接运行"></a>idea中直接运行</h2><h3 id="配置jdk"><a href="#配置jdk" class="headerlink" title="配置jdk"></a>配置jdk</h3><p>打开File–&gt;Project Structure–&gt;Platform settings–&gt;SDKS选择Java的安装路径即可Apply即可。<br>我在mac上安装的jdk11，默认路径为/Library/Java/JavaVirtualMachines/jdk-11.0.1.jdk/Contents/Home</p>
-<h3 id="main运行"><a href="#main运行" class="headerlink" title="main运行"></a>main运行</h3><p> 点击main函数的运行，出现了以下error。<br><img src="/media/15511688084057.jpg" alt="logo"><br>明明jdk11中有这个包呀，Google和百度了半天也没收获。最后无奈又下载了一个jdk8，因为pom文件中的java-version为1.8，然后真的没有出现这个问题啦。</p>
-<h3 id="配置参数"><a href="#配置参数" class="headerlink" title="配置参数"></a>配置参数</h3><p>因为wordCount需要指定文件名，故在run-edit Configurations配置<br><img src="/media/15511734004612.jpg" alt="logo"><br><img src="/media/15511737245037.jpg" alt="logo"><br>其中<br>VM options: -Dspark.master=local<br>Program arguments:/Users/liuzebin/open_source_project/spark/examples/src/main/resources/people.txt<br>第一个参数为指定spark为local运行模式，第二个为wordcount程序的参数，即需要统计文件的目录。</p>
-<h3 id="异常"><a href="#异常" class="headerlink" title="异常"></a>异常</h3><p><img src="/media/15511744085856.jpg" alt="logo"><br>这个应该找不到类的引用，百度一下是因为pom文件中的<scope>private</scope>,<br>把examples下的pom文件中的<scope>private</scope>改为<scope>compile</scope><br>然后出现以下错误<br><img src="/media/15511786721385.jpg" alt="logo"><br>和上面的错误类似，但是examples下的pom文件中的scope已经全改为了compile了呀，然后不知所云。后来发现com.goole这包还是provided，这是因为examples下的pom文件还依赖外部的pom文件，外部文件中的com.google为provided。<br><img src="/media/15511892095820.jpg" alt="logo"></p>
-<p><img src="/media/15511892995170.jpg" alt="logo"></p>
-<p>然后这问题解决了，又出来新问题，心累哈<br><img src="/media/15511898552941.jpg" alt="logo"></p>
-<p>发现最外层的pom中，哎，决定一不做二不休，把pom中的<scope>provided</scope>全替换为<scope>compile</scope><br><img src="/media/15511900477440.jpg" alt="logo"><br>最后终于ok啦，输出了大量的info日志，哈哈，开心。<br><img src="/media/15511904174896.jpg" alt="logo"></p>
-<p>java.lang.NoClassDefFoundError 基本都是类导入失败，大概是pom文件中对应类的scope为provided,删除或改为compile即可。</p>
-<h1 id="单步debug"><a href="#单步debug" class="headerlink" title="单步debug"></a>单步debug</h1><p>在程序对应的点打上断点，然后运行debug即刻，然后就可以看到变量的值啦。<br><img src="/media/15512586046152.jpg" alt="logo"></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </div>
@@ -926,10 +414,11 @@
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -937,6 +426,10 @@
 
 
           
+
+  
+
+
 
         </div>
         
@@ -957,8 +450,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
             
@@ -1009,6 +511,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Kafka生产者"><span class="nav-number">1.</span> <span class="nav-text">Kafka生产者</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#生产者发送消息的简单过程"><span class="nav-number">1.1.</span> <span class="nav-text">生产者发送消息的简单过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建生产者"><span class="nav-number">1.2.</span> <span class="nav-text">创建生产者</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#maven依赖："><span class="nav-number">1.2.1.</span> <span class="nav-text">maven依赖：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建生产者-1"><span class="nav-number">1.2.2.</span> <span class="nav-text">创建生产者</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消息发送"><span class="nav-number">1.3.</span> <span class="nav-text">消息发送</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#发后即忘"><span class="nav-number">1.3.1.</span> <span class="nav-text">发后即忘</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#同步发送"><span class="nav-number">1.3.2.</span> <span class="nav-text">同步发送</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异步发送"><span class="nav-number">1.3.3.</span> <span class="nav-text">异步发送</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#消息发送重试"><span class="nav-number">1.3.4.</span> <span class="nav-text">消息发送重试</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#序列化"><span class="nav-number">1.4.</span> <span class="nav-text">序列化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分区器"><span class="nav-number">1.5.</span> <span class="nav-text">分区器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拦截器"><span class="nav-number">1.6.</span> <span class="nav-text">拦截器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原理分析"><span class="nav-number">1.7.</span> <span class="nav-text">原理分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RecordAccumulator"><span class="nav-number">1.7.1.</span> <span class="nav-text">RecordAccumulator</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#InFlightRequests"><span class="nav-number">1.7.2.</span> <span class="nav-text">InFlightRequests</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重要参数"><span class="nav-number">1.7.3.</span> <span class="nav-text">重要参数</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -1142,6 +660,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
