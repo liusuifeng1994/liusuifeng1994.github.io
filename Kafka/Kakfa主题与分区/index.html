@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="kafka,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Kafka主题与分区主题和分区是Kafka的核心概念，主题是消息的归类，一个主题可以再次细分为一到多个分区，分区可以看作是消息的二次归类。主题和分区不仅为Kafka提供了可伸缩性，可扩展性，还可通过分区副本实现高可靠性。 主题的管理创建主题创建主题有很多方式，可以是自动创建，也可以手动创建自动创建如果我们在配置文件中配置的auto.create.topics.enable :true那么当我们生产">
+<meta name="keywords" content="kafka">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kafka主题与分区">
+<meta property="og:url" content="https://liusuifeng1994.github.io/Kafka/Kakfa主题与分区/index.html">
+<meta property="og:site_name" content="Liusuifeng&#39;s Blog">
+<meta property="og:description" content="Kafka主题与分区主题和分区是Kafka的核心概念，主题是消息的归类，一个主题可以再次细分为一到多个分区，分区可以看作是消息的二次归类。主题和分区不仅为Kafka提供了可伸缩性，可扩展性，还可通过分区副本实现高可靠性。 主题的管理创建主题创建主题有很多方式，可以是自动创建，也可以手动创建自动创建如果我们在配置文件中配置的auto.create.topics.enable :true那么当我们生产">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://liusuifeng1994.github.io/media/15842413366557.jpg">
+<meta property="og:updated_time" content="2020-03-15T05:33:27.680Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="kafka主题与分区">
+<meta name="twitter:description" content="Kafka主题与分区主题和分区是Kafka的核心概念，主题是消息的归类，一个主题可以再次细分为一到多个分区，分区可以看作是消息的二次归类。主题和分区不仅为Kafka提供了可伸缩性，可扩展性，还可通过分区副本实现高可靠性。 主题的管理创建主题创建主题有很多方式，可以是自动创建，也可以手动创建自动创建如果我们在配置文件中配置的auto.create.topics.enable :true那么当我们生产">
+<meta name="twitter:image" content="https://liusuifeng1994.github.io/media/15842413366557.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://liusuifeng1994.github.io/Kafka/Kakfa主题与分区/">
+
+
+
+
+
+  <title>kafka主题与分区 | Liusuifeng's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Liusuifeng's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://liusuifeng1994.github.io/Kafka/Kakfa主题与分区/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Liusuifeng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Liusuifeng's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">kafka主题与分区</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-12T13:00:00+08:00">
+                2020-03-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Kafka主题与分区"><a href="#Kafka主题与分区" class="headerlink" title="Kafka主题与分区"></a>Kafka主题与分区</h1><p>主题和分区是Kafka的核心概念，主题是消息的归类，一个主题可以再次细分为一到多个分区，分区可以看作是消息的二次归类。主题和分区不仅为Kafka提供了可伸缩性，可扩展性，还可通过分区副本实现高可靠性。</p>
+<h2 id="主题的管理"><a href="#主题的管理" class="headerlink" title="主题的管理"></a>主题的管理</h2><h3 id="创建主题"><a href="#创建主题" class="headerlink" title="创建主题"></a>创建主题</h3><p>创建主题有很多方式，可以是自动创建，也可以手动创建<br><strong>自动创建</strong><br>如果我们在配置文件中配置的<br><code>auto.create.topics.enable :true</code><br>那么当我们生产者向一个不存在的主题发送数据的时候，那么就会自动创建一个分区数为nums.partitions(默认1），副本数为default.replication.factor(默认为1)的主题，当然如果我们消费一个不存在的主题的时候，也会创建一个主题，分区和副本数会按照默认值进行创建。<br>但是我们一般在开发中是不建议开启自动创建的，因为这样会导致维护成本大，并且创建的主题是否规范等也是问题。</p>
+<p><strong>手动创建</strong><br><code>./kafka-topics.sh --zookeeper localhost:2181/kafka --create --topic topic_test --partitions 3 --replication-factor 2</code><br>我们执行上面的操作命令就创建了一个topic 为topic_test的主题，分区为3，副本为2.</p>
+<p>Kafka会在log.dir/log.dirs参数所配置的目录下创建主题分区，默认是/tmp/kafka-logs<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ls -al /tmp/kafka-logs | grep topic_test</span><br><span class="line">drwxr-xr-x    2 root  root    107 Sep 8 16:58 topic_test-1</span><br><span class="line">drwxr-xr-x    2 root  root    107 Sep 8 16:58 topic_test-2</span><br></pre></td></tr></table></figure></p>
+<p>可以看到，创建了两个文件夹，后面的数字代表的是分区号，一般文件夹的格式为：主题-分区号<br>由于分区*副本会根据broker数量分配在不同的broker中，所以每个broker看到的分区信息是不同的。同一个分区中的多个副本必须分布在不同的broker中，才能提供有效的数据冗余</p>
+<p><img src="/media/15842413366557.jpg" alt="-w459"></p>
+<p>除此之外还可以通过zookeeper进行查看配置信息<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">get  /broker/topics/topic_test</span><br><span class="line">&#123;&quot;version&quot;:1,&quot;partitions&quot;:&#123;&quot;0&quot;: [1,2], &quot;1&quot;: [0,1], &quot;2&quot;: [0,2]&#125;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>创建主题时的分区副本都是按照既定的内部逻辑来进行分配的。kafka-topics.sh 脚本中还提 供了一个replica-assignment参数手动指定分区副本的分配方案。<br><code>./kafka-topics.sh --zookeeper localhost:2181/kafka --create --topic topic-create-same --replica-assignment 2:0,0:1,1:2,2:1</code><br>这种方式根据分区号的数值大小按照从小到大的顺序进行排序，分区与分区之间用逗号,隔开，分区内多个副本用冒号:隔开。并且在使用–replica-assignment参数创建主题时不需要原本必备的partitions和replication-factor这两个参数。创建时注意同一分区内的副本不能有重复</p>
+<h3 id="查看主题"><a href="#查看主题" class="headerlink" title="查看主题"></a>查看主题</h3><p>查看主题有两个相关的命令，一个是list,一个是describe，list命令是显示出我们创建的所有主题，describe是显示某个主题的相关信息。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">./kafka-topics.sh --zookeeper localhost:2181/kafka --describe --topic topic_test</span><br><span class="line">Topic:topic_test PartitionCount:3    ReplicationFactor:2 Configs:</span><br><span class="line">    Topic: topic_test    Partition: 0    Leader: 0   Replicas: 0,1   Isr: 0,1</span><br><span class="line">    Topic: topic_test    Partition: 1    Leader: 1   Replicas: 1,2   Isr: 1,2</span><br><span class="line">    Topic: topic_test    Partition: 2    Leader: 2   Replicas: 2,0   Isr: 2,0</span><br></pre></td></tr></table></figure>
+<p>在查看主题的时候，我们还可以指定参数，来显示有问题的主题分区<br>under-replicated-partitions 找出包含失效副本的分区<br>unavailable-partitions 查看主题中没有leader副本的分区</p>
+<h3 id="修改主题"><a href="#修改主题" class="headerlink" title="修改主题"></a>修改主题</h3><p>在我们创建了主题之后,我们可以修改我们创建的主题,比如修改分区的个数,主题的配置等,主要通过关键字alert来实现。</p>
+<p><strong>修改分区</strong><br>./kafka-topics.sh –zookeeper localhost:2181/kafka  –alter –topic topic_test –partitions 4</p>
+<p>说明：<br>    1、如果我们的主题消息中包含key时，那么根据key计算分区的行为就会受到影响，因为计算分区是需要根据key的值来计算的<br>    2、还会影响消息的顺序问题，所以建议应该是先创建好主题，避免后期修改<br>说明：<br>kafka只支持增加分区，现在还不能支持<strong>减少分区</strong>。因为如果减少分区会有所影响，比如有下面这几方面影响<br>    1、删除的分区消息如何处理<br>    2、在分区数据在复制期间可能性如何保证<br>    3、分区进行删除的时候占用资源等<br>    最好的方式就是创建一个新的主题，然后将现在主题的数据复制过去</p>
+<p><strong>修改配置</strong><br>我们可以利用alter来修改在创建主题时候指定的配置信息，可以将原来的配置给覆盖掉。<br><code>./kafka-topics.sh --zookeeper localhost:2181/kafka --alter --topic topic_test  --config max.message.bytes=500</code><br>通过上面的命令，把原来的配置config max.message.bytes 修改为500</p>
+<p><strong>删除配置</strong><br>我们可以使用delete-config来删除之前我们修改的配置，让这个值恢复到原有的默认值<br><code>./kafka-topics.sh --zookeeper localhost:2181/kafka --alter --topic topic_test  --delete-config max.message.bytes=500</code><br>上面的命令会让配置max.message.bytes恢复成默认值1000</p>
+<h3 id="配置管理"><a href="#配置管理" class="headerlink" title="配置管理"></a>配置管理</h3><p>在kafka的bin路径下面，有kafka-configs.sh脚本，这个脚本主要是对配置进行管理，指的是我们的kafka在运行的状态，能够动态的进行修改，这个命令不仅能修改主题相关的配置，还能修改broker，用户，客户端等方面的配置。这个命令需要两个参数，一个是entity-type，用来指定操作配置的类型，比如是topic还是其他，另外一个就是entity-name，用来表示操作配置的名称。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./kafka-configs.sh --zookeeper localhost:2181/kafka --describe --entity-type topics --entity-name topic_test</span><br><span class="line">Configs for topic &apos;topic_test&apos; are max.message.bytes=1000</span><br></pre></td></tr></table></figure>
+<p>entity-type的取值有下面几种：<br>topics: 主题相关<br>brokers: broker类型的配置<br>clients: 客户端类型的配置<br>users: 用户类型的配置<br>在使用alter进行变更配置的时候，会和add-config和delete-config配合使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./kafka-configs.sh --zookeeper localhost:2181/kafka --alter --entity-type topics --entity-name topic_test --add-config max.message.bytes=800</span><br></pre></td></tr></table></figure>
+<h3 id="删除主题"><a href="#删除主题" class="headerlink" title="删除主题"></a>删除主题</h3><p>当我们的主题不在被需要的时候，我们可以把主题删除了，这样的释放资源，比如磁盘空间，文件句柄等。</p>
+<p><code>./kafka-topics.sh --zookeeper localhost:2181/kafka --delete --topic topic_test</code></p>
+<p>说明：<br>1、我们可以删除我们创建的主题，无法删除kafka内部自己的主题，比如<strong>consumer_offsets, </strong>transaction_state<br>2、删除一个不存在的主题也会报错，为了避免，我们可以加上参数–if-exists</p>
+<p>其实删除主题本质上，只是在zk的、admin/delete_topics下创建一个待删除主题同名的节点，表示这个主题是要删除的，但是真正执行删除的动作是由kafka的控制器负责完成的。</p>
+<p>补充：<br>手动删除主题，主题中的元数据是在/brokers/topics和/config/topics下面，主题的数据内容是在log.dir目录下面<br>所以如果我们手动删除的话，那么就在这几个地方把相关数据删除即可<br>1、删除/brokers/topics下需要删除的主题<br>2、删除/config/topics下需要删除的主要的配置<br>3、删除log.dir或者log.dirs下的数据内容</p>
+<h2 id="初识KafkaAdminClient"><a href="#初识KafkaAdminClient" class="headerlink" title="初识KafkaAdminClient"></a>初识KafkaAdminClient</h2><h3 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h3><p>KafkaAdminClient继承了org.apache.kafka.clients.admin.AdminClient抽象类，主要方法如下：</p>
+<ul>
+<li>创建主题：CreateTopicsResult createTopics(Collection<newtopic> newTopics)</newtopic></li>
+<li>删除主题：DeleteTopicsResult deleteTopics(Collection<string> topics)</string></li>
+<li>列出所有可用的主题：ListTopicsResult listTopics()</li>
+<li>查看主题的信息：DescribeTopicsResult describeTopics(Collection<string> topicNames)</string></li>
+<li>查询配置信息：DescribeConfigsResult describeConfigs(Collection<configresource> resources)</configresource></li>
+<li>修改配置信息：AlterConfigsResult alterConfigs(Map&lt;ConfigResource, Config&gt; configs)</li>
+<li>增加分区：CreatePartitionsResult createPartitions(Map&lt;String, NewPartitions&gt; newPartitions)</li>
+</ul>
+<h3 id="创建主题-1"><a href="#创建主题-1" class="headerlink" title="创建主题"></a>创建主题</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">@RunWith(SpringRunner.class)</span><br><span class="line">@SpringBootTest</span><br><span class="line">public class KafkaAdminTest &#123;</span><br><span class="line">    @Test</span><br><span class="line">    public void createTopic() &#123;</span><br><span class="line">        String brokerList = &quot;192.168.126.158:9092&quot;;</span><br><span class="line">        String topic = &quot;topic-admin&quot;;</span><br><span class="line">        Properties props = new Properties();</span><br><span class="line">        props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList);</span><br><span class="line">        props.put(AdminClientConfig.REQUEST_TIMEOUT_MS_CONFIG, 30000);</span><br><span class="line">        AdminClient client = AdminClient.create(props);</span><br><span class="line">        NewTopic newTopic = new NewTopic(topic, 4, (short) 1);</span><br><span class="line">        CreateTopicsResult result = client.createTopics(Collections.singleton(newTopic));</span><br><span class="line">        try &#123;</span><br><span class="line">            result.all().get();</span><br><span class="line">        &#125; catch (InterruptedException | ExecutionException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            client.close();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>AdminClient.create()方法实际上调用的就是KafkaAdminClient中的createInternal方法构建的KafkaAdminClient实例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public static AdminClient create(Properties props) &#123;</span><br><span class="line">       return KafkaAdminClient.createInternal(new AdminClientConfig(props), null);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>NewTopic用来设定所要创建主题的具体信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public class NewTopic &#123;</span><br><span class="line">    private final String name;//主题名称</span><br><span class="line">    private final int numPartitions;//分区数</span><br><span class="line">    private final short replicationFactor;//副本因子</span><br><span class="line">    private final Map&lt;Integer, List&lt;Integer&gt;&gt; replicasAssignments;//分配方案</span><br><span class="line">    private Map&lt;String, String&gt; configs = null;//配置</span><br></pre></td></tr></table></figure>
+<p>可以通过指定分区数和副本因子来创建一个主题</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;Integer, List&lt;Integer&gt;&gt; replicasAssignments = new HashMap&lt;&gt;();</span><br><span class="line">replicasAssignments.put(0, Arrays.asList(0));</span><br><span class="line">replicasAssignments.put(1, Arrays.asList(0));</span><br><span class="line">replicasAssignments.put(2, Arrays.asList(0));</span><br><span class="line">replicasAssignments.put(3, Arrays.asList(0));</span><br><span class="line">NewTopic newTopic = new NewTopic(topic, replicasAssignments);</span><br></pre></td></tr></table></figure>
+<p>也可以在创建主题时指定需要覆盖的配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, String&gt; configs=new HashMap&lt;&gt;();</span><br><span class="line">configs.put(&quot;cleanup.policy&quot;,&quot;compact&quot;);</span><br><span class="line">newTopic.configs(configs);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public class CreateTopicsResult &#123;</span><br><span class="line">    private final Map&lt;String, KafkaFuture&lt;Void&gt;&gt; futures;</span><br><span class="line"></span><br><span class="line">    CreateTopicsResult(Map&lt;String, KafkaFuture&lt;Void&gt;&gt; futures) &#123;</span><br><span class="line">        this.futures = futures;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Map&lt;String, KafkaFuture&lt;Void&gt;&gt; values() &#123;</span><br><span class="line">        return futures;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public KafkaFuture&lt;Void&gt; all() &#123;</span><br><span class="line">        return KafkaFuture.allOf(futures.values().toArray(new KafkaFuture[0]));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>CreateTopicsResult中的方法主要是针对成员变量futures的操作，futures的类型Map&lt;String, KafkaFuture<void>&gt;中的key代表主题名称，而KafkaFuture<void>代表创建后的返回值类型。KafkaAdminClient中的createTopics()方法可以一次性创建多个主题。KafkaFuture实现了Future接口，可以通过Future.get()方法来等待服务端的返回</void></void></p>
+<p>KafkaAdminClient中的listTopics()方法的返回值为ListTopicsResult类型，这个ListTopicsResult类型内部的成员变量future的类型为KafkaFuture&lt;Map&lt;String, TopicListing&gt;&gt;，这里包含了具体的返回信息</p>
+<p>使用close()方法释放资源</p>
+<h3 id="查看主题具体配置信息"><a href="#查看主题具体配置信息" class="headerlink" title="查看主题具体配置信息"></a>查看主题具体配置信息</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">String brokerList = &quot;192.168.126.158:9092&quot;;</span><br><span class="line">String topic = &quot;topic-admin&quot;;</span><br><span class="line">Properties props = new Properties();</span><br><span class="line">props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList);</span><br><span class="line">props.put(AdminClientConfig.REQUEST_TIMEOUT_MS_CONFIG, 30000);</span><br><span class="line">AdminClient client = AdminClient.create(props);</span><br><span class="line">ConfigResource resource = new ConfigResource(ConfigResource.Type.TOPIC, topic);</span><br><span class="line">DescribeConfigsResult result = client.describeConfigs(Collections.singleton(resource));</span><br><span class="line">Config config = result.all().get().get(resource);</span><br><span class="line">System.out.println(config);</span><br><span class="line">client.close();</span><br></pre></td></tr></table></figure>
+<h3 id="修改主题配置信息"><a href="#修改主题配置信息" class="headerlink" title="修改主题配置信息"></a>修改主题配置信息</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ConfigResource resource = new ConfigResource(ConfigResource.Type.TOPIC, topic);</span><br><span class="line">ConfigEntry entry = new ConfigEntry(&quot;cleanup.policy&quot;, &quot;compact&quot;);</span><br><span class="line">Config config = new Config(Collections.singleton(entry));</span><br><span class="line">Map&lt;ConfigResource, Config&gt; configs = new HashMap&lt;&gt;();</span><br><span class="line">configs.put(resource, config);</span><br><span class="line">AlterConfigsResult result = client.alterConfigs(configs);</span><br><span class="line">result.all().get();</span><br></pre></td></tr></table></figure>
+<h3 id="修改分区"><a href="#修改分区" class="headerlink" title="修改分区"></a>修改分区</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">NewPartitions newPartitions = NewPartitions.increaseTo(5);</span><br><span class="line">Map&lt;String, NewPartitions&gt; newPartitionsMap = new HashMap&lt;&gt;();</span><br><span class="line">newPartitionsMap.put(topic, newPartitions);</span><br><span class="line">CreatePartitionsResult result = client.createPartitions(newPartitionsMap);</span><br><span class="line">result.all().get();</span><br></pre></td></tr></table></figure>
+<h3 id="主题合法性验证"><a href="#主题合法性验证" class="headerlink" title="主题合法性验证"></a>主题合法性验证</h3><p>Kafka broker端create.topic.policy.class.name参数，默认值为null，它提供了一个入口用来验证主题创建的合法性，需要自定义实现org.apache.kafka.server.policy.CreateTopicPolicy接口，然后在broker端的配置文件config/server.properties中配置参数create.topic.policy.class.name的值</p>
+<p>主要实现接口的configure()、close()和validate()方法，configure()方法会在Kafka服务启动的时候执行，validate()方法用来鉴定主题参数的合法性，在创建主题时执行，close()方法在关闭Kafka服务时执行</p>
+<h2 id="分区管理"><a href="#分区管理" class="headerlink" title="分区管理"></a>分区管理</h2><h3 id="优先副本的选举"><a href="#优先副本的选举" class="headerlink" title="优先副本的选举"></a>优先副本的选举</h3><p>在创建主题的时候，该主题的分区及副本会尽可能均匀地分布到Kafka集群的各个broker节点上，对应的leader副本的分配也比较均匀<br>当分区的leader节点发生故障时，其中一个follower节点就会成为新的leader节点，这样就会导致集群的负载不均衡。当原来的leader节点恢复之后重新加入集群时，它只能成为一个新的follower节点而不再对外提供服务<br>优先副本是指在AR集合列表中的第一个副本。优先副本的选举是指通过一定的方式促使优先副本选举为leader副本，以此来促进集群的负载均衡，这一行为也可以称为分区平衡</p>
+<p>Kafka提供分区自动平衡的功能，与此对应的broker参数是auto.leader.rebalance.enable，此参数的默认值为true，默认情况下此功能是开启的。如果开启分区自动平衡的功能，则Kafka的控制器会启动一个定时任务，这个定时任务会轮询所有的broker节点，计算每个broker节点的分区不平衡率（broker中的不平衡率=非优先副本的leader个数/分区总数）是否超过leader.imbalance.per.broker.percentage参数配置的比值，默认值为10%，如果超过设定的比值则会自动执行优先副本的选举动作以求分区平衡。执行周期由参数leader.imbalance.check.interval.seconds控制，默认值为300秒，即5分钟</p>
+<h3 id="分区重分配"><a href="#分区重分配" class="headerlink" title="分区重分配"></a>分区重分配</h3><p>分区重分配的基本原理是先通过控制器为每个分区添加新副本（增加副本因子），新的副本将从分区的leader副本那里复制所有的数据。根据分区的大小不同，复制过程可能需要花一些时间，因为数据是通过网络复制到新副本上的。在复制完成之后，控制器将旧副本从副本清单里移除（恢复为原先的副本因子）。在重分配的过程中要确保有足够的空间</p>
+<h3 id="复制限流"><a href="#复制限流" class="headerlink" title="复制限流"></a>复制限流</h3><p>对副本间的复制流量加以限制来保证重分配期间整体服务不会受太大的影响</p>
+<p>kafka-configs.sh脚本主要以动态配置的方式来达到限流的目的，在broker级别有两个与复制限流相关的配置参数：follower.replication.throttled.rate和leader.replication.throttled.rate，前者用于设置follower副本复制的速度，后者用于设置leader副本传输的速度，它们的单位都是B/s。通过情况下，两者的配置值是相同的。下面将broker1中的leader副本和follower副本的复制速度限制在1024B/s之内</p>
+<h2 id="资料"><a href="#资料" class="headerlink" title="资料"></a>资料</h2><p><a href="https://zhuanlan.zhihu.com/p/93790595" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/93790595</a><br><a href="https://blog.csdn.net/qq_40378034/article/details/90487244" target="_blank" rel="noopener">https://blog.csdn.net/qq_40378034/article/details/90487244</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/kafka/" rel="tag"># kafka</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/面试整理/计算机网络/计算机网络面试整理/" rel="next" title="计算机网络面试整理">
+                <i class="fa fa-chevron-left"></i> 计算机网络面试整理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/Kafka/Kakfa日志存储/" rel="prev" title="kafka日志存储">
+                kafka日志存储 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Liusuifeng</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">tags</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Kafka主题与分区"><span class="nav-number">1.</span> <span class="nav-text">Kafka主题与分区</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#主题的管理"><span class="nav-number">1.1.</span> <span class="nav-text">主题的管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建主题"><span class="nav-number">1.1.1.</span> <span class="nav-text">创建主题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看主题"><span class="nav-number">1.1.2.</span> <span class="nav-text">查看主题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改主题"><span class="nav-number">1.1.3.</span> <span class="nav-text">修改主题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置管理"><span class="nav-number">1.1.4.</span> <span class="nav-text">配置管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除主题"><span class="nav-number">1.1.5.</span> <span class="nav-text">删除主题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初识KafkaAdminClient"><span class="nav-number">1.2.</span> <span class="nav-text">初识KafkaAdminClient</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基本使用"><span class="nav-number">1.2.1.</span> <span class="nav-text">基本使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建主题-1"><span class="nav-number">1.2.2.</span> <span class="nav-text">创建主题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看主题具体配置信息"><span class="nav-number">1.2.3.</span> <span class="nav-text">查看主题具体配置信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改主题配置信息"><span class="nav-number">1.2.4.</span> <span class="nav-text">修改主题配置信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改分区"><span class="nav-number">1.2.5.</span> <span class="nav-text">修改分区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主题合法性验证"><span class="nav-number">1.2.6.</span> <span class="nav-text">主题合法性验证</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分区管理"><span class="nav-number">1.3.</span> <span class="nav-text">分区管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#优先副本的选举"><span class="nav-number">1.3.1.</span> <span class="nav-text">优先副本的选举</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分区重分配"><span class="nav-number">1.3.2.</span> <span class="nav-text">分区重分配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#复制限流"><span class="nav-number">1.3.3.</span> <span class="nav-text">复制限流</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#资料"><span class="nav-number">1.4.</span> <span class="nav-text">资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Liusuifeng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

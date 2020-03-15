@@ -92,7 +92,7 @@
 <meta property="og:image" content="https://liusuifeng1994.github.io/media/15828787308307.jpg">
 <meta property="og:image" content="https://liusuifeng1994.github.io/media/15828801094738.jpg">
 <meta property="og:image" content="https://liusuifeng1994.github.io/media/15828801200328.jpg">
-<meta property="og:updated_time" content="2020-02-28T08:56:50.686Z">
+<meta property="og:updated_time" content="2020-02-29T09:50:47.075Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="kafka生产者">
 <meta name="twitter:description" content="Kafka生产者生产者发送消息的简单过程Kafka会将发送消息包装为ProducerRecord对象，ProducerRecord 对象包含了目标主题和要发送的内容，同时还可以指定键和分区。在发送 ProducerRecord 对象前，生产者会先把键和值对象序列化成字节数组，这样它们才能够在网络上传输。接下来，数据会经过拦截器、序列化器和分区器。如果之前已经在ProducerRecord对象里指定">
@@ -315,7 +315,7 @@
 <li>key.serializer: 指定键的序列化器；</li>
 <li>value.serializer: 指定值的序列化器。</li>
 </ul>
-<p>简单代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">public class SimpleProducer &#123;</span><br><span class="line">    public static final String brokerList = &apos;localhost:9092&apos;</span><br><span class="line">    public static final String topic = &apos;topic-demo&apos;</span><br><span class="line">    </span><br><span class="line">    public static Properties initConfig()&#123;</span><br><span class="line">        Properties props = new Properties();</span><br><span class="line">        props.put(&quot;bootstrap.servers&quot;, brokerList);</span><br><span class="line">        props.put(&quot;key.serializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);</span><br><span class="line">        props.put(&quot;value.serializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);</span><br><span class="line">        props.put(&quot;client.id&quot;, Producer.client.id.demo);</span><br><span class="line">        return props;</span><br><span class="line">    &#125;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Properties props = initConfig();        </span><br><span class="line">        /*创建生产者*/</span><br><span class="line">        Producer&lt;String, String&gt; producer = new KafkaProducer&lt;&gt;(props);</span><br><span class="line">        ProducerRecord&lt;String, String&gt; record = new ProducerRecord&lt;&gt;(topic, &quot;hello&quot;);</span><br><span class="line">        try&#123;</span><br><span class="line">            /* 发送消息*/</span><br><span class="line">            producer.send(record);</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        /*关闭生产者*/</span><br><span class="line">        producer.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>简单代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">public class SimpleProducer &#123;</span><br><span class="line">    public static final String brokerList = &apos;localhost:9092&apos;</span><br><span class="line">    public static final String topic = &apos;topic-demo&apos;</span><br><span class="line">    </span><br><span class="line">    public static Properties initConfig()&#123;</span><br><span class="line">        Properties props = new Properties();</span><br><span class="line">        props.put(&quot;bootstrap.servers&quot;, brokerList);</span><br><span class="line">        props.put(&quot;key.serializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);</span><br><span class="line">        props.put(&quot;value.serializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);</span><br><span class="line">        props.put(&quot;client.id&quot;, &quot;producer.client.id.demo&quot;);</span><br><span class="line">        return props;</span><br><span class="line">    &#125;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        Properties props = initConfig();        </span><br><span class="line">        /*创建生产者*/</span><br><span class="line">        Producer&lt;String, String&gt; producer = new KafkaProducer&lt;&gt;(props);</span><br><span class="line">        ProducerRecord&lt;String, String&gt; record = new ProducerRecord&lt;&gt;(topic, &quot;hello&quot;);</span><br><span class="line">        try&#123;</span><br><span class="line">            /* 发送消息*/</span><br><span class="line">            producer.send(record);</span><br><span class="line">        &#125; catch (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        /*关闭生产者*/</span><br><span class="line">        producer.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <h2 id="消息发送"><a href="#消息发送" class="headerlink" title="消息发送"></a>消息发送</h2><p>上面的示例程序调用了 send 方法发送消息后没有做任何操作，在这种情况下，我们没有办法知道消息发送的结果。想要知道消息发送的结果，可以使用同步发送或者异步发送来实现。</p>
 <h3 id="发后即忘"><a href="#发后即忘" class="headerlink" title="发后即忘"></a>发后即忘</h3><p>上述代码直接调用send()就是发后即忘， 不关心消息是否发送失败或成功。此种发送消息方式效率最高，但是可靠性也是最低的。</p>
 <h3 id="同步发送"><a href="#同步发送" class="headerlink" title="同步发送"></a>同步发送</h3><p>在调用 send 方法后可以接着调用get() 方法，send 方法的返回值是一个 Future<recordmetadata>对象，RecordMetadata 里面包含了发送消息的主题、分区、偏移量等信息。改写后的代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">try &#123;</span><br><span class="line">    ProducerRecord&lt;String, String&gt; record = new ProducerRecord&lt;&gt;(topic, &quot;hello&quot;);</span><br><span class="line">    /*同步发送消息*/</span><br><span class="line">    RecordMetadata metadata = producer.send(record).get();</span><br><span class="line">    System.out.printf(&quot;topic=%s, partition=%d, offset=%s \n&quot;,</span><br><span class="line">            metadata.topic(), metadata.partition(), metadata.offset());</span><br><span class="line">&#125; catch (InterruptedException | ExecutionException e) &#123;</span><br><span class="line">    e.printStackTrace();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></recordmetadata></p>
@@ -386,8 +386,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/leetcode/数组/二分法/二分法思路与模版/" rel="next" title="二分法思路与模版">
-                <i class="fa fa-chevron-left"></i> 二分法思路与模版
+              <a href="/Kafka/Kafka基础与架构/" rel="next" title="kafka基础与架构">
+                <i class="fa fa-chevron-left"></i> kafka基础与架构
               </a>
             
           </div>
@@ -396,8 +396,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/Kafka/Kafka基础与架构/" rel="prev" title="kafka基础与架构">
-                kafka基础与架构 <i class="fa fa-chevron-right"></i>
+              <a href="/Kafka/Kafka消费者/" rel="prev" title="kafka消费者">
+                kafka消费者 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -475,7 +475,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -488,7 +488,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">tags</span>
                 
               </div>

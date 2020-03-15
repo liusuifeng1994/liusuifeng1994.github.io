@@ -79,18 +79,26 @@
 
 
 
-<meta name="description" content="Kafka消费者## 广发100 000826">
+<meta name="description" content="Kafka消费者消费者与消费组一般有两种消息投递模式:点对点（P2P, Point-to-Point)模式和发布/订阅(Pub/Sub)模式Kafka同时支持两种消息投递模式：  点对点:如果所有的消费者都隶属于同一个消费组，那么所有的消息都会被均衡地投递给每一个消费者，即每条消息只会被一个消费者处理，这就相当于点对点模式的应用。 发布订阅:如果所有的消费者都隶属于不同的消费组，那么所有的消息都会">
 <meta name="keywords" content="kafka">
 <meta property="og:type" content="article">
 <meta property="og:title" content="kafka消费者">
 <meta property="og:url" content="https://liusuifeng1994.github.io/Kafka/Kafka消费者/index.html">
 <meta property="og:site_name" content="Liusuifeng&#39;s Blog">
-<meta property="og:description" content="Kafka消费者## 广发100 000826">
+<meta property="og:description" content="Kafka消费者消费者与消费组一般有两种消息投递模式:点对点（P2P, Point-to-Point)模式和发布/订阅(Pub/Sub)模式Kafka同时支持两种消息投递模式：  点对点:如果所有的消费者都隶属于同一个消费组，那么所有的消息都会被均衡地投递给每一个消费者，即每条消息只会被一个消费者处理，这就相当于点对点模式的应用。 发布订阅:如果所有的消费者都隶属于不同的消费组，那么所有的消息都会">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2020-02-29T09:22:54.777Z">
+<meta property="og:image" content="https://liusuifeng1994.github.io/media/15829691705213.jpg">
+<meta property="og:image" content="https://liusuifeng1994.github.io/media/15829692652691.jpg">
+<meta property="og:image" content="https://liusuifeng1994.github.io/media/15829710654294.jpg">
+<meta property="og:image" content="https://liusuifeng1994.github.io/media/15829712490391.jpg">
+<meta property="og:image" content="https://liusuifeng1994.github.io/media/15829725380731.jpg">
+<meta property="og:image" content="https://liusuifeng1994.github.io/media/15829730203328.jpg">
+<meta property="og:image" content="https://liusuifeng1994.github.io/media/15829730717962.jpg">
+<meta property="og:updated_time" content="2020-03-15T05:34:20.657Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="kafka消费者">
-<meta name="twitter:description" content="Kafka消费者## 广发100 000826">
+<meta name="twitter:description" content="Kafka消费者消费者与消费组一般有两种消息投递模式:点对点（P2P, Point-to-Point)模式和发布/订阅(Pub/Sub)模式Kafka同时支持两种消息投递模式：  点对点:如果所有的消费者都隶属于同一个消费组，那么所有的消息都会被均衡地投递给每一个消费者，即每条消息只会被一个消费者处理，这就相当于点对点模式的应用。 发布订阅:如果所有的消费者都隶属于不同的消费组，那么所有的消息都会">
+<meta name="twitter:image" content="https://liusuifeng1994.github.io/media/15829691705213.jpg">
 
 
 
@@ -300,8 +308,72 @@
       
 
       
-        <h1 id="Kafka消费者"><a href="#Kafka消费者" class="headerlink" title="Kafka消费者"></a>Kafka消费者</h1><p>##</p>
-<p>广发100 000826</p>
+        <h1 id="Kafka消费者"><a href="#Kafka消费者" class="headerlink" title="Kafka消费者"></a>Kafka消费者</h1><h2 id="消费者与消费组"><a href="#消费者与消费组" class="headerlink" title="消费者与消费组"></a>消费者与消费组</h2><p>一般有两种消息投递模式:点对点（P2P, Point-to-Point)模式和发布/订阅(Pub/Sub)模式<br>Kafka同时支持两种消息投递模式：</p>
+<ul>
+<li>点对点:如果所有的消费者都隶属于同一个消费组，那么所有的消息都会被均衡地投递给每一个消费者，即每条消息只会被一个消费者处理，这就相当于点对点模式的应用。</li>
+<li>发布订阅:如果所有的消费者都隶属于不同的消费组，那么所有的消息都会被广播给所有的消费者，即每条消息会被所有的消费者处理，这就相当于发布/订阅模式的应用。</li>
+</ul>
+<p>在 Kafka 中，消费者通常是消费者群组的一部分，多个消费者群组共同读取同一个主题时，彼此之间互不影响。<br><img src="/media/15829691705213.jpg" alt="-w359"></p>
+<p>同一个分区只能被同一个消费者群组里面的一个消费者读取，一般不存在同一个分区被同一个消费者群里多个消费者共同读取的情况。因此合理设置消费者数量，提高消费能力的同时以及避免造成闲置和额外开销。<br><img src="/media/15829692652691.jpg" alt="-w356"></p>
+<h2 id="消费者消费"><a href="#消费者消费" class="headerlink" title="消费者消费"></a>消费者消费</h2><p>一个正常的消费逻辑需要具备以下几个步骤:<br>(1) 配置消费者客户端参数及创建相应的消费者实例 。<br>(2) 订阅主题。<br>(3）拉取消息并消费<br>(4）提交消费位移 。<br>(5) 关闭消费者实例。</p>
+<h3 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a>示例代码</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">public class KafkaConsumers&#123;</span><br><span class="line">    public static final String brokerList = &apos;localhost:9200&apos;;</span><br><span class="line">    public static final String topic = &apos;topic-demo&apos;;</span><br><span class="line">    public static final String groupId = &apos;group.demo&apos;;</span><br><span class="line">    public static final AtomicBoolean isRunning = new AtomicBoolean(true);</span><br><span class="line"></span><br><span class="line">    public static Properties initConfig()&#123;</span><br><span class="line">        Properties props = new Properties();</span><br><span class="line">        props.put(&quot;bootstrap.servers&quot;, brokerList);</span><br><span class="line">        props.put(&quot;key.deserializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);</span><br><span class="line">        props.put(&quot;value.deserializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);</span><br><span class="line">        props.put(&quot;group.id&quot;, groupId);</span><br><span class="line">        props.put(&quot;client.id&quot;, &quot;consumer.client.id.demo&quot;);</span><br><span class="line">        return props;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args)&#123;</span><br><span class="line">        Properties props = initConfig();</span><br><span class="line">        KafkaConsumer&lt;String, String&gt; consumer = new KafkaConsumer&lt;&gt;(props);</span><br><span class="line"></span><br><span class="line">        // 订阅</span><br><span class="line">        consumer.subscribe(Arrays.asList(topic));</span><br><span class="line"></span><br><span class="line">        try &#123;</span><br><span class="line">            while(isRunning.get())&#123;</span><br><span class="line">                ConsumerRecords&lt;String, String&gt; records = consumer.poll(Duration.ofMillis(1000));</span><br><span class="line">                for (ConsumerRecords&lt;String, String&gt; record: records)&#123;</span><br><span class="line">                    System.out.println(&apos;topic = &apos; + record.topic() + </span><br><span class="line">                        &apos;, partition = &apos; + record.partition());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; catch (Exception e)&#123;</span><br><span class="line">            log.error(e);</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            consumer.close()</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>必要参数</strong></p>
+<pre><code>1. bootstrap.servers 与生产者中的KafkaProducer中的相同
+2. group.id消费组的名称, 默认值为&quot;&quot;， 设置为空，会报异常
+3. key.deserializer 和 value.deserializer, 对应KafkaProducer的序列化方式。
+</code></pre><h3 id="订阅主题与分区"><a href="#订阅主题与分区" class="headerlink" title="订阅主题与分区"></a>订阅主题与分区</h3><p>一个消费者可以订阅一个或多个主题，subscribe()方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public void subscribe(Collection&lt;String&gt; topics , ConsumerRebalanceListener listener)</span><br><span class="line">public void subscribe(Collection&lt;String&gt; topics)</span><br><span class="line">public void subscribe(Pattern pattern , ConsumerRebalanceListener listener) </span><br><span class="line">public void subscribe (Pattern pattern)</span><br></pre></td></tr></table></figure></p>
+<p>支持正则订阅，如果先后多次订阅以最后的为准。</p>
+<p><strong>订阅分区</strong><br>消费者不仅可以直接订阅主题，还可以订阅主题下的特定分区（assign()方法）<br><code>public void assign(Collection&lt;TopicPartition&gt; partitions)</code><br>例如订阅topic下的第0个分区:<br><code>consumer.assign(Arrays.asList(new TopicParitition(&quot;topic&quot;, 0)))</code></p>
+<p>可通过partitionsFor()方法可以用来查询指定主题的元数据信息<br><code>public List&lt;PartitionInfo&gt; partitionsFor(String topic)</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public class PartitionInfo &#123;</span><br><span class="line">    private final String topic;</span><br><span class="line">    private final int partition;</span><br><span class="line">    private final Node leader;</span><br><span class="line">    private final Node[] replicas;</span><br><span class="line">    private final Node[] inSyncReplicas;</span><br><span class="line">    private final Node[] offlineReplicas;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>取消订阅</strong><br>    consumer.unsubscribe()；</p>
+<h3 id="反序列化"><a href="#反序列化" class="headerlink" title="反序列化"></a>反序列化</h3><p>与生产者的序列化相对应，通常使用StringDeserializer。</p>
+<h3 id="消息消费"><a href="#消息消费" class="headerlink" title="消息消费"></a>消息消费</h3><p>kafka消息消费就是重复性调用poll()方法。<br>public ConsumerRecords&lt;K, V&gt; poll(final Duration timeout)<br><img src="/media/15829710654294.jpg" alt="-w399"></p>
+<h3 id="控制或关闭消费"><a href="#控制或关闭消费" class="headerlink" title="控制或关闭消费"></a>控制或关闭消费</h3><p><code>public void pause(Collection&lt;TopicPartition&gt; partitions)</code><br><code>public void resume(Collection&lt;TopicPartition&gt; partitions)</code><br>//返回被暂停的分区集合<br><code>public Set&lt;TopicPartition&gt; paused()</code><br>退出消费: consumer.wakeup()</p>
+<h2 id="位移提交"><a href="#位移提交" class="headerlink" title="位移提交"></a>位移提交</h2><p>在每次调用 poll()方法时，它返回的是还没有被消费过的消息集<br>在旧消费者客户端中，消费位移是存储在ZooKeeper中的。而在新消费者客户端中，消费位移存储在Kafka内部的主题_consumer_offsets中。消费者在消费完消息之后需要执行消费位移的提交。<br><img src="/media/15829712490391.jpg" alt="-w410"></p>
+<h3 id="自动提交偏移量"><a href="#自动提交偏移量" class="headerlink" title="自动提交偏移量"></a>自动提交偏移量</h3><p>在 Kafka 中默认的消费位移的提交方式是自动提交，enable.auto.commit 属性配置为 true 即可完成自动提交的配置。此时每隔固定的时间，消费者就会把poll()方法接收到的最大偏移量进行提交，提交间隔由auto.commit.interval.ms 属性进行配置，默认值是 5s。<br>    自动位移提交的动作是在 poll()方法的逻辑里完成的，在每次真正向服务端发起拉取请求之前会检 查是否可以进行位移提交，如果可以，那么就会提交上一次轮询的位移。<br>    由于自动提交是延时提交，如果服务异常导致位移不能提交的话，可能会导致重复消费。如果消费端只是将数据存入内存，并提交位移，可能会导致消息丢失。</p>
+<h3 id="同步手动提交"><a href="#同步手动提交" class="headerlink" title="同步手动提交"></a>同步手动提交</h3><p>通过调用 consumer.commitSync() 来进行同步提交，不传递任何参数时提交的是当前轮询的最大偏移量。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">while (true) &#123;</span><br><span class="line">    ConsumerRecords&lt;String, String&gt; records = consumer.poll(Duration.of(100, ChronoUnit.MILLIS));</span><br><span class="line">    for (ConsumerRecord&lt;String, String&gt; record : records) &#123;</span><br><span class="line">        System.out.println(record);</span><br><span class="line">    &#125;</span><br><span class="line">    /*同步提交*/</span><br><span class="line">    consumer.commitSync();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果某个提交失败，同步提交还会进行重试，这可以保证数据能够最大限度提交成功，但是同时也会降低程序的吞吐量。基于这个原因，Kafka 还提供了异步提交的 API。</p>
+<h3 id="异步手动提交"><a href="#异步手动提交" class="headerlink" title="异步手动提交"></a>异步手动提交</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">while (true) &#123;</span><br><span class="line">    ConsumerRecords&lt;String, String&gt; records = consumer.poll(Duration.of(100, ChronoUnit.MILLIS));</span><br><span class="line">    for (ConsumerRecord&lt;String, String&gt; record : records) &#123;</span><br><span class="line">        System.out.println(record);</span><br><span class="line">    &#125;</span><br><span class="line">    /*异步提交并定义回调*/</span><br><span class="line">    consumer.commitAsync(new OffsetCommitCallback() &#123;</span><br><span class="line">        @Override</span><br><span class="line">        public void onComplete(Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets, Exception exception) &#123;</span><br><span class="line">          if (exception != null) &#123;</span><br><span class="line">             System.out.println(&quot;错误处理&quot;);</span><br><span class="line">             offsets.forEach((x, y) -&gt; System.out.printf(&quot;topic = %s,partition = %d, offset = %s \n&quot;,</span><br><span class="line">                                                            x.topic(), x.partition(), y.offset()));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="同步加异步提交"><a href="#同步加异步提交" class="headerlink" title="同步加异步提交"></a>同步加异步提交</h3><p>在正常的轮询中使用异步提交来保证吞吐量，但是因为在最后即将要关闭消费者了，所以此时需要用同步提交来保证最大限度的提交成功。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">try &#123;</span><br><span class="line">    while (true) &#123;</span><br><span class="line">        ConsumerRecords&lt;String, String&gt; records = consumer.poll(Duration.of(100, ChronoUnit.MILLIS));</span><br><span class="line">        for (ConsumerRecord&lt;String, String&gt; record : records) &#123;</span><br><span class="line">            System.out.println(record);</span><br><span class="line">        &#125;</span><br><span class="line">        // 异步提交</span><br><span class="line">        consumer.commitAsync();</span><br><span class="line">    &#125;</span><br><span class="line">&#125; catch (Exception e) &#123;</span><br><span class="line">    e.printStackTrace();</span><br><span class="line">&#125; finally &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        // 因为即将要关闭消费者，所以要用同步提交保证提交成功</span><br><span class="line">        consumer.commitSync();</span><br><span class="line">    &#125; finally &#123;</span><br><span class="line">        consumer.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="位移消费"><a href="#位移消费" class="headerlink" title="位移消费"></a>位移消费</h2><p>当消费者找不到自己的消费记录时，会根据参数auto.offset.reset来决定从何处消费。<br>auto.offset.reset有 earliest,latest,none</p>
+<p>也可以通过seek指定分区的消费offset。<br><code>KafkaConsumer.seek()</code><br><code>public void seek(TopicPartition partition , long offset)</code><br>seek需要指定具体的offset，但是通常我们生产中更多的是从某个时间段开始消费。提供了OffsetsForTimes()方法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public Map&lt;TopicPartition, OffsetAndTimestamp&gt; offsetsForTimes(Map&lt;TopicPartition, Long&gt; timestampsToSearch)</span><br><span class="line">public Map&lt;TopicPartition , OffsetAndTimestamp&gt;)</span><br><span class="line">offsetsForTimes(Map&lt;TopicPartitioη, Long&gt; timestampsToSearch,</span><br><span class="line">Duration timeout)</span><br></pre></td></tr></table></figure>
+<p><img src="/media/15829725380731.jpg" alt="-w633"></p>
+<h2 id="再均衡"><a href="#再均衡" class="headerlink" title="再均衡"></a>再均衡</h2><p>再均衡是指分区的所属权从一个消费者转移到另一消费者的行为，它为消费组具备高可用性和伸缩性提供保障，使我们可以既方便又安全地删除消费组内的消费者或往消费组内添加消费者<br>再均衡发生期间，消费组内的消费者是无法读取消息的，消费者当前的状态也会丢失。</p>
+<p>再均衡监昕器ConsumerRebalanceListener接口<br><code>void onPartitionsRevoked(Collection&lt;TopicPartition&gt; partitions)</code>再均衡开始之前和消费者停止读取消息之后被调用。可以通过这个回调方法来处理消费位移的提交，以此来避免一些不必要的重复消费现象的发生<br><code>void onPartitionsAssigned(Collection&lt;TopicPartition&gt; partitions</code>这个方法会在重新分配分区之后和消费者开始读取消费之前被调用。</p>
+<p>可以在再均衡前执行一些操作：比如提交已经处理但是尚未提交的偏移量，关闭数据库连接等。此时可以在订阅主题时候，调用 subscribe 的重载方法传入自定义的分区再均衡监听器。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets = new HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">consumer.subscribe(Collections.singletonList(topic), new ConsumerRebalanceListener() &#123;</span><br><span class="line">    /*该方法会在消费者停止读取消息之后，再均衡开始之前就调用*/</span><br><span class="line">    @Override</span><br><span class="line">    public void onPartitionsRevoked(Collection&lt;TopicPartition&gt; partitions) &#123;</span><br><span class="line">        System.out.println(&quot;再均衡即将触发&quot;);</span><br><span class="line">        // 提交已经处理的偏移量</span><br><span class="line">        consumer.commitSync(offsets);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /*该方法会在重新分配分区之后，消费者开始读取消息之前被调用*/</span><br><span class="line">    @Override</span><br><span class="line">    public void onPartitionsAssigned(Collection&lt;TopicPartition&gt; partitions) &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">try &#123;</span><br><span class="line">    while (true) &#123;</span><br><span class="line">        ConsumerRecords&lt;String, String&gt; records = consumer.poll(Duration.of(100, ChronoUnit.MILLIS));</span><br><span class="line">        for (ConsumerRecord&lt;String, String&gt; record : records) &#123;</span><br><span class="line">            System.out.println(record);</span><br><span class="line">            TopicPartition topicPartition = new TopicPartition(record.topic(), record.partition());</span><br><span class="line">            OffsetAndMetadata offsetAndMetadata = new OffsetAndMetadata(record.offset() + 1, &quot;no metaData&quot;);</span><br><span class="line">            /*TopicPartition 重写过 hashCode 和 equals 方法，所以能够保证同一主题和分区的实例不会被重复添加*/</span><br><span class="line">            offsets.put(topicPartition, offsetAndMetadata);</span><br><span class="line">        &#125;</span><br><span class="line">        consumer.commitAsync(offsets, null);</span><br><span class="line">    &#125;</span><br><span class="line">&#125; finally &#123;</span><br><span class="line">    consumer.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="拦截器"><a href="#拦截器" class="headerlink" title="拦截器"></a>拦截器</h2><p>org.apache.kafka.clients.consumer.Consumerlnterceptor接口<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public ConsumerRecords&lt;K, V&gt; onConsume(ConsumerRecords&lt;K, V&gt; records); </span><br><span class="line">public void onCommit(Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets);</span><br><span class="line">public void close();</span><br></pre></td></tr></table></figure></p>
+<p>poll()方法返回之前调用拦截器的onConsume(), 可以在此过滤部分数据。<br>KafkaConsumer会在提交完消费位移之后调用拦截器的onCommit()方法，可以使用这个方法来记录跟踪所提交的位移信息</p>
+<h2 id="多线程消费"><a href="#多线程消费" class="headerlink" title="多线程消费"></a>多线程消费</h2><p>KafkaProducer是线程安全的，然而KafkaConsumer却是<strong>非线程安全</strong>的<br>KafkaConsumer中定义了一个acquire()方法 ，用来检测当前是否只有一个线程在操作，<br>KafkaConsumer 中的每个公用方法在执行所要执行的动作之前都会调用这个acquire()方法， 只有wakeup()方法是个例外</p>
+<ol>
+<li>一个线程对应一个KafkaConsumer 实例，我们可以称之为消费线程。一个消费线程可以消费一个或多个分区中的消息，所有的消费线程都隶属于同一个消费组。这种实现方式的并发度受限于分区的实际个数.<br><img src="/media/15829730203328.jpg" alt="-w590"></li>
+</ol>
+<p>优点: 每个线程可以按顺序消费各个分区中的消息。<br>缺点: 每个消费线程都要维护一个独立的TCP连接， 如果分区数和consumerThreadNum的值都很大，那么会造成不小的系统开销。</p>
+<ol start="2">
+<li>多个消费线程同时消费同一个分区 ，这个通过assign()、seek()等方法实现，这样可以打破原有的消费线程的个数不能超过分区数的限制，进一步提高了消费的能力,不过这种实现方式对于位移提交和顺序控制的处理就会变得非常复杂.(不推荐）</li>
+<li>将处理消息模块改成多线程的实现方式<br><img src="/media/15829730717962.jpg" alt="-w524"></li>
+</ol>
+<p>优点：减少 TCP 连接对系统资源的消耗，<br>缺点：对于消息的顺序处理就比较困难了，位移指针提交会增加消息重复或丢失的风险(可采用共享offset滑动窗口)</p>
+<h2 id="重要消费者参数"><a href="#重要消费者参数" class="headerlink" title="重要消费者参数"></a>重要消费者参数</h2><ol>
+<li>fetch.min.bytes<br> Consumer 在一次拉取请求(调用 poll()方法)中能从 Kafka 中拉取的最小数据量，默认值为 1 (B)，适当调大这个参数的值以提高一定的吞吐量，不过也会造成额外的延迟。</li>
+<li>fetch.max.bytes<br> 它用来配置 Consumer在一次拉取请求中从 Kafka 中拉取的最大数据量，默认值为 52428800B（50MB）。</li>
+<li>fetch.max.wait.ms<br> 参数用于指定 Kafka 的等待时间，默认值为 500 (ms）</li>
+<li>max.patition.fetch.bytes<br> 从每个分区里返回给 Consumer的最大数据量，默认值为 1048576B(1MB),与<br>fetch.max.bytes参数相似，前者用来限制一次拉取中每个分区的消息大小，而后者用来限制一次拉取中整体消息的大小。</li>
+<li>max.poll.records<br> 一次拉取请求中拉取的最大消息数，默认值为 500 (条)。</li>
+<li>connections.max.idle.ms<br> 多久之后关闭限制的连接，默认值是 540000 (ms)，即 9 分钟。</li>
+<li>exclude.internal.topics</li>
+<li>receive.buffer.bytes<br> 这个参数用来设置 Socket 接收消息缓冲区(SO_RECBUF的大小，默认值为 65536B (64KB),如果设置为-1，则使用操作系统的默认值。如果Consumer与Kafka处于不同的机房， 则可以适当调大这个参数值。</li>
+<li>send.buffer.bytes<br>  Socket发送消息缓冲区(SO_SNDBUF)的大小，默认值为 131072B(128KB)</li>
+<li>request.timeout.ms<br>Consumer 等待请求响应的最长时间，默认值为 30000 (ms)。</li>
+<li>metadata.max.age.ms<br>元数据的过期时间，默认值为 300000 (ms)，即 5 分钟。如果元数据在 此参数所限定的时间范围内没有进行更新，则会被强制更新</li>
+<li>reconnect.backoff.ms<br>这个参数用来配置尝试重新连接指定主机之前的等待时间(也称为退避时间)，避免频繁地连接主机，默认值为 50 (ms)。这种机制适用于消费者向 broker 发送的所有请求。</li>
+<li>retry.backoff.ms<br>这个参数用来配置尝试重新发送失败的请求到指定的主题分区之前的等待(退避)时间，<br>避免在某些故障情况下频繁地重复发送，默认值为 100 (ms)。</li>
+<li>isolation.level</li>
+</ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://juejin.im/post/5d8593946fb9a06b0703f9c3" target="_blank" rel="noopener"> Kafka 消费者详解 </a><br><a href="https://blog.csdn.net/qq_40378034/article/details/90416260" target="_blank" rel="noopener">https://blog.csdn.net/qq_40378034/article/details/90416260</a></p>
 
       
     </div>
@@ -332,8 +404,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/Kafka/Kafka基础与架构/" rel="next" title="kafka基础与架构">
-                <i class="fa fa-chevron-left"></i> kafka基础与架构
+              <a href="/Kafka/KaKfa生产者/" rel="next" title="kafka生产者">
+                <i class="fa fa-chevron-left"></i> kafka生产者
               </a>
             
           </div>
@@ -341,6 +413,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/面试整理/计算机网络/计算机网络面试整理/" rel="prev" title="计算机网络面试整理">
+                计算机网络面试整理 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -417,7 +493,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">13</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
@@ -430,7 +506,7 @@
               
               <div class="site-state-item site-state-tags">
                 
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">tags</span>
                 
               </div>
@@ -463,7 +539,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Kafka消费者"><span class="nav-number">1.</span> <span class="nav-text">Kafka消费者</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Kafka消费者"><span class="nav-number">1.</span> <span class="nav-text">Kafka消费者</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#消费者与消费组"><span class="nav-number">1.1.</span> <span class="nav-text">消费者与消费组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消费者消费"><span class="nav-number">1.2.</span> <span class="nav-text">消费者消费</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#示例代码"><span class="nav-number">1.2.1.</span> <span class="nav-text">示例代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#订阅主题与分区"><span class="nav-number">1.2.2.</span> <span class="nav-text">订阅主题与分区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#反序列化"><span class="nav-number">1.2.3.</span> <span class="nav-text">反序列化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#消息消费"><span class="nav-number">1.2.4.</span> <span class="nav-text">消息消费</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#控制或关闭消费"><span class="nav-number">1.2.5.</span> <span class="nav-text">控制或关闭消费</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#位移提交"><span class="nav-number">1.3.</span> <span class="nav-text">位移提交</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#自动提交偏移量"><span class="nav-number">1.3.1.</span> <span class="nav-text">自动提交偏移量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#同步手动提交"><span class="nav-number">1.3.2.</span> <span class="nav-text">同步手动提交</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异步手动提交"><span class="nav-number">1.3.3.</span> <span class="nav-text">异步手动提交</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#同步加异步提交"><span class="nav-number">1.3.4.</span> <span class="nav-text">同步加异步提交</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#位移消费"><span class="nav-number">1.4.</span> <span class="nav-text">位移消费</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#再均衡"><span class="nav-number">1.5.</span> <span class="nav-text">再均衡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拦截器"><span class="nav-number">1.6.</span> <span class="nav-text">拦截器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多线程消费"><span class="nav-number">1.7.</span> <span class="nav-text">多线程消费</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重要消费者参数"><span class="nav-number">1.8.</span> <span class="nav-text">重要消费者参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">1.9.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></div>
             
 
           </div>
