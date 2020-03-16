@@ -79,18 +79,26 @@
 
 
 
-<meta name="description" content="kafka服务端深入">
+<meta name="description" content="kafka服务端深入协议设计Kafka自定义了一组基于TCP的二进制协议，只要遵守这组协议的格式，就可以向Kafka发送消息，也可以从中拉取消息。在Kafka2.0.0中，一共包含了43种协议类型，每种协议类型都有对应的请求和响应，它们都遵循特定的协议模式。每种类型的Rquest都包含相同结构的协议请求头和不同结构的协议请求体 协议请求头中包含4个域：api_key、api_version、cor">
 <meta name="keywords" content="kafka">
 <meta property="og:type" content="article">
 <meta property="og:title" content="kafka服务端深入">
 <meta property="og:url" content="https://liusuifeng1994.github.io/Kafka/Kafka服务端深入/index.html">
 <meta property="og:site_name" content="Liusuifeng&#39;s Blog">
-<meta property="og:description" content="kafka服务端深入">
+<meta property="og:description" content="kafka服务端深入协议设计Kafka自定义了一组基于TCP的二进制协议，只要遵守这组协议的格式，就可以向Kafka发送消息，也可以从中拉取消息。在Kafka2.0.0中，一共包含了43种协议类型，每种协议类型都有对应的请求和响应，它们都遵循特定的协议模式。每种类型的Rquest都包含相同结构的协议请求头和不同结构的协议请求体 协议请求头中包含4个域：api_key、api_version、cor">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2020-03-15T05:33:27.693Z">
+<meta property="og:image" content="https://liusuifeng1994.github.io/media/15843253500633.jpg">
+<meta property="og:image" content="https://liusuifeng1994.github.io/media/15843253727598.jpg">
+<meta property="og:image" content="https://liusuifeng1994.github.io/media/15843254014287.jpg">
+<meta property="og:image" content="https://liusuifeng1994.github.io/media/15843256512136.jpg">
+<meta property="og:image" content="https://liusuifeng1994.github.io/media/15843257633814.jpg">
+<meta property="og:image" content="https://liusuifeng1994.github.io/media/15843259687986.jpg">
+<meta property="og:image" content="https://liusuifeng1994.github.io/media/15843261766853.jpg">
+<meta property="og:updated_time" content="2020-03-16T02:41:29.140Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="kafka服务端深入">
-<meta name="twitter:description" content="kafka服务端深入">
+<meta name="twitter:description" content="kafka服务端深入协议设计Kafka自定义了一组基于TCP的二进制协议，只要遵守这组协议的格式，就可以向Kafka发送消息，也可以从中拉取消息。在Kafka2.0.0中，一共包含了43种协议类型，每种协议类型都有对应的请求和响应，它们都遵循特定的协议模式。每种类型的Rquest都包含相同结构的协议请求头和不同结构的协议请求体 协议请求头中包含4个域：api_key、api_version、cor">
+<meta name="twitter:image" content="https://liusuifeng1994.github.io/media/15843253500633.jpg">
 
 
 
@@ -300,7 +308,54 @@
       
 
       
-        <h1 id="kafka服务端深入"><a href="#kafka服务端深入" class="headerlink" title="kafka服务端深入"></a>kafka服务端深入</h1>
+        <h1 id="kafka服务端深入"><a href="#kafka服务端深入" class="headerlink" title="kafka服务端深入"></a>kafka服务端深入</h1><h2 id="协议设计"><a href="#协议设计" class="headerlink" title="协议设计"></a>协议设计</h2><p>Kafka自定义了一组基于TCP的二进制协议，只要遵守这组协议的格式，就可以向Kafka发送消息，也可以从中拉取消息。在Kafka2.0.0中，一共包含了43种协议类型，每种协议类型都有对应的请求和响应，它们都遵循特定的协议模式。每种类型的Rquest都包含相同结构的协议请求头和不同结构的协议请求体<br><img src="/media/15843253500633.jpg" alt=""></p>
+<p>协议请求头中包含4个域：api_key、api_version、correlation_id和client_id<br><img src="/media/15843253727598.jpg" alt=""><br>每种类型的Response也包含相同结构的协议响应头和不同结构的响应体<br><img src="/media/15843254014287.jpg" alt=""><br>协议响应头中只有一个correlation_id</p>
+<h2 id="时间轮"><a href="#时间轮" class="headerlink" title="时间轮"></a>时间轮</h2><p>Kafka的延时操作是基于时间轮的概念自定义实现了一个用于延时功能的定时器。JDK中Timer和DelayQueue的插入和删除操作的平均时间复杂度为O(nlogn)，而基于时间轮可以将插入和删除操作的时间复杂度都降为O(1)<br>Kafka中的时间轮是一个存储定时任务的环形队列，底层采用数组实现，数组中的每个元素都可以存放一个定时任务列表（TimerTaskList）。TimerTaskList是一个环形的双向链表，链表中的每一项表示的都是定时任务项，其中封装了真正的定时任务</p>
+<p>时间轮由多个时间格组成，每个时间格代表当前时间轮的基本时间跨度（tickMs）。时间轮的时间格个数是固定的，可用wheelSize来表示，那么整个时间轮的总体时间跨度（interval）可以通过公式tickMs*wheelSize计算得出。时间轮还有一个表盘指针（currentTime），用来表示时间轮当前所处的时间，currentTime是tickMs的整数倍。currentTime可以将整个时间轮划分为到期部分和未到期部分，currentTime当前指向的时间格也属于到期部分，表示刚到到期，需要处理此时间格所对应的TimerTaskList中的所有任务<br><img src="/media/15843256512136.jpg" alt="-w680"><br>若时间轮的tickMs为1ms且wheelSize等于20，可以计算得出总体时间跨度interval为20ms。初始情况下表盘指针currentTime指向时间格0，此时有一个定时为2ms的任务插进来会存放到时间格为2的TimerTaskList中。随着时间推移，指针currentTime不断向前推进，过了2ms之后，当到达时间格2时，就需要将时间格2对应的TimerTaskList中的任务进行相应的到期操作。此时若有一个定时为8ms的任务插进来，则会存放到时间格10中，currentTime再过8ms后会指向时间格10.如果同时有一个定时为19ms的任务插进来，新来的TimerTaskEntry会复用原来的TimerTaskList，所以它会插入原本已经到期的时间格1。整个时间轮的总体跨度是不变的，随着指针currentTime的不断推进，当前时间轮所能处理的时间段也在不断后移，总体时间范围在currentTime和currentTime+interval之间</p>
+<p>Kafka引入了层级时间轮的概念，当任务的到期时间超过了当前时间轮所表示的时间范围时，就会尝试添加到上层时间轮中<br><img src="/media/15843257633814.jpg" alt="-w754"></p>
+<p>上图中，第一层的时间轮tickMs=1ms、wheelSize=20、interval=20ms。第二层的时间轮的tickMs为第一层时间轮的interval，即20ms。每一层时间轮的wheelSize是固定的，都是20，那么第二层的时间轮的总体时间跨度interval为400ms。这个400ms也是第三层的tickMs的大小，第三层的时间轮的总体时间跨度为8000ms</p>
+<p>450ms的定时任务第一层时间轮不能满足条件，所以就升级到第二层时间轮中，第二层时间轮也无法满足条件，所以又升级到第三层时间轮中，最终被插入第三层时间轮中时间格1所对应的TimerTaskList。在到期时间为[400ms,800ms)区间内的多个任务都会被放入第三层时间轮的时间格1，时间格1对应的TimerTaskList的超时时间为400ms。随着时间的推移，当此TimerTaskList到期之时，原本定时为450ms的任务还剩下50ms的时间，还不能执行这个任务的到期操作。这时候会做一个时间轮降级的操作，会将整个剩余时间为50ms的定时任务重新提交到层级时间轮中，此时第一层时间轮的总体时间跨度不够，而第二层足够，所以该任务被放到第二层时间轮到期时间为[40ms,60ms)的时间格中。再经历40ms之后，此时这个任务还剩10ms，还是不能立即执行到期操作。所以还要再有一次时间轮的降级，此任务被添加到第一层时间轮到期时间为[10ms,11ms)的时间格中，之后再经历10ms后，此任务真正到期，最终执行相应的到期操作</p>
+<ul>
+<li>时间轮在创建的时候以当前系统时间为第一层时间轮的起始时间</li>
+<li>时间轮中的每个双向环形链表TimerTaskList都会有一个哨兵节点，作为第一个节点，它的值域不存储任何东西，只是为了操作的方便而引入的</li>
+<li>除了第一层时间轮，其余高层时间轮的起始时间都设置为创建此层时间轮前面第一轮的currentTime。第一层的currentTime都必须是tickMs的整数倍</li>
+<li>Kafka中的定时器只需持有时间轮的第一层时间轮的引用，并不会直接持有其他高层的时间轮，但每一层时间轮都会有一个引用指向更高一层的应用，以此层级调用可以实现定时器间接持有各个层级时间轮的引用</li>
+</ul>
+<p>Kafka中的定时器借用了JDK中的DelayQueue来协助推进时间轮。对于每个使用到的TimerTaskList（费哨兵节点的定时任务项TimerTaskEntry对应的TimerTaskList）都加入DelayQueue。DelayQueue会根据TimerTaskList对应的超时时间expiration来排序，最短expiration的TimerTaskList会被排在DelayQueue的队头。Kafka中会有一个线程（ExpiredOperationReaper）来获取DelayQueue中到期的任务列表。当线程获取DelayQueue中超时的任务列表TimerTaskList之后，即可以根据TimerTaskList的expiration来推进时间轮的时间，也可以就获取的TimerTaskList执行相应的操作，对里面的TimerTaskEntry该执行过期操作的就执行过期操作，该降级时间轮的就降级时间轮</p>
+<p>Kafka中的时间轮专门用来执行插入和删除TimerTaskEntry的操作，而DelayQueue专门负责时间推进的任务</p>
+<p>DelayQueue中第一个超时任务列表的expiration为200ms，第二个超时任务为840ms，这里获取DelayQueue的队头只需要O(1)的时间复杂度（获取之后DelayQueue内部才会再次切换出新的队头）。如果采用每秒定时推进，那么获取第一个超时的任务列表时执行的200次推进中有199次属于空推进，而获取第二个超时任务时有需要执行639次空推进，这样会无故空耗机器的性能资源</p>
+<h2 id="延时操作"><a href="#延时操作" class="headerlink" title="延时操作"></a>延时操作</h2><h3 id="延时生产"><a href="#延时生产" class="headerlink" title="延时生产"></a>延时生产</h3><p>如果在使用生产者客户单发送消息的时候将acks参数设置为-1，那么就意味着需要等待ISR集合中的所有副本都确认收到消息之后才能正确地收到响应的结果，或者捕获超时异常。在将消息写入leader副本的本地日志文件之后，Kafka会创建一个延时的生产操作，用来处理消息正常写入所有副本或超时的情况，以返回相应的响应结果给客户端</p>
+<p>随着follower副本不断地与leader副本进行消息同步，进而促使HW进一步增长，HW每增长一次都会检测是否能够完成此次延时生产操作，如果可以就执行以此返回响应结果给客户端；如果在超时时间内始终无法完成，则强制执行</p>
+<p>延时操作创建之后会被加入延时操作管理器来做专门的处理。延时操作有可能会超时，每个延时操作管理器都会配备一个定时器来做超时管理，定时器的底层就是采用时间轮实现的。时间轮的轮转是靠线程ExpiredOperationReaper来驱动的，这里ExpiredOperationReaper由延时操作管理器启动的。定时器、ExpiredOperationReaper和延时操作管理器都是一一对应的。延时操作需要支持外部事件的触发，所以还要配备一个监听池来负责监听每个分区的外部事件——查看是否有分区的HW发生了增长。ExpiredOperationReaper不仅可以推进时间轮，还会定期清理监听池中已完成的延时操作<br><img src="/media/15843259687986.jpg" alt="-w731"></p>
+<p>如果客户端设置的acks参数不为-1，或者没有成功的消息写入，那么就直接返回结果给客户端，否则就需要创建延时生产操作并存入延时操作管理器，最终要么由外部事件触发，要么超时触发而执行</p>
+<h3 id="延时拉取"><a href="#延时拉取" class="headerlink" title="延时拉取"></a>延时拉取</h3><p>两个follower副本都已经拉取到了leader副本的最新位置，此时又向leader副本发送拉取请求，而leader副本没有新的消息写入，这时Kafka选择了延时操作来处理这种情况。Kafka在处理拉取请求时，会先去读一次日志文件，如果收集不到足够多（fetchMinBytes，由参数fetch.min.bytes配置，默认值为1）的的消息，那么就会创建一个延时拉取操作以等待拉取到足够数量的消息。当延时拉取操作执行时，会再读取一次日志文件，然后将拉取结果返回给follower副本。延时拉取操作也会有一个专门的延时操作管理器负责管理，大体和延时生产相同。如果拉取进度一直没有追赶上leader副本，那么在拉取leader副本的消息时一般拉取的消息大小都会不小于fetchMinBytes，这样Kafka也就不会创建相应的延时拉取操作，而是立即返回拉取结果</p>
+<h2 id="控制器"><a href="#控制器" class="headerlink" title="控制器"></a>控制器</h2><p>在 Kafka 集群中会有一个或多个 broker，其中有一个 broker 会被选举为控制器( Kafka Controller)，它负责管理整个集群中所有分区和副本的状态。当某个分区的 leader 副本出现故 障时，由控制器负责为该分区选举新的 leader副本。当检测到某个分区的 ISR集合发生变化时， 由控制器负责通知所有 broker更新其元数据信息。当使用 kafka-topics.sh 脚本为某个 topic 增加分区数量时，同样还是由控制器负责分区的重新分配 。</p>
+<h3 id="控制器的选举及异常恢复"><a href="#控制器的选举及异常恢复" class="headerlink" title="控制器的选举及异常恢复"></a>控制器的选举及异常恢复</h3><p>Kafka中的控制器选举工作依赖于ZooKeeper，成功竞选为控制器的broker会在ZooKeeper中创建/controller这个临时节点，此临时节点的内容参考如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[zk: localhost:2181(CONNECTED) 0] get /controller</span><br><span class="line">&#123;&quot;version&quot;:1,&quot;brokerid&quot;:1,&quot;timestamp&quot;:&quot;1558621064185&quot;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其中version在目前版本中固定为1，brokerid表示成为控制器的broker的id编号，timestamp表示竞选成为控制器时的时间戳</p>
+<p>在任意时刻，集群中有且仅有一个控制器。每个broker启动的时候会去尝试读取/controller节点的brokerid的值，如果读取到brokerid的值不为-1，则表示已经有其他broker节点成功竞选为控制器，所以当前broker就会放弃竞选；如果ZooKeeper中不存在/controller节点，或者这个节点中的数据异常，那么就会尝试去创建/controller节点。当前broker去创建节点的时候，也有可能其他broker同时去尝试创建这个节点，只有创建成功的那个broker才会成为控制器，而创建失败的broker竞选失败。每个broker都会在内存中保存当前控制器的brokerid值，这个值可以标记为activeControllerId</p>
+<p>ZooKeeper中还有一个与控制器有关的/controller_epoch节点，这个节点是持久节点，节点中存放的是一个整型的controller_epoch值。controller_epoch用于记录控制器发生变更的次数，即记录当前的控制器是第几代控制器，可以称为控制器的纪元</p>
+<p>controller_epoch的初始值为1，当控制器发生变更时，每选出一个新的控制器就将该字段值加1。每个和控制器交互的请求都会携带controller_epoch这个字段，如果请求的controller_epoch值小于内存中的controller_epoch值，则认为这个请求是向已经过期的控制器所发送的请求，被认定为无效请求。如果请求的controller_epoch值大于内存的controller_epoch值，那么说明已经有新的控制器当选了。Kafka通过controller_epoch来保证控制器的唯一性</p>
+<p><img src="/media/15843261766853.jpg" alt="-w631"></p>
+<p>控制器在选举成功之后会读取ZooKeeper中各个节点的数据来初始化上下文信息（ControllerContext），并且需要管理这些上下文信息。不管是监听器触发的事件，还是定时任务触发的事件，或者是其他事件都会读取或更新控制器中的上下文信息，那么就会涉及多线程间的同步。针对这一现象，Kafka的控制器使用单线程基于事件队列的模型，将每个事件都做一层封装，然后按照事件飞升的先后顺序暂存到LinkedBlockingQueue中，最后使用一个专用的线程（ControllerEventThread）按照FIFO的原则顺序处理各个事件，这样不需要锁机制就可以在多线程间维护线程安全</p>
+<p>在目前的新版本的设计中，只有Kafka Controller在ZooKeeper上注册相应的监听器，其他的broker极少需要再监听ZooKeeper中的数据变化。不过每个broker还是会对/controller节点添加监听器，以此来监听此节点的数据变化</p>
+<p>当/controller节点的数据发生变化时，每个broker都会更新自身内存中保存的activeControllerId。如果broker在数据变更前是控制器，在数据变更后自身的brokerid值与新的activeControllerId值不一致，那么就需要退位，关闭相应的资源，比如关闭状态机、注销相应的监听器等。有可能控制器由于异常而下线，造成/controller这个临时节点被自动删除；也有可能是其他原因将此节点删除了</p>
+<p>当/controller节点被删除时，每个broker都会进行选举，如果broker在节点被删除前是控制器，那么在选举前还需要有一个退位的动作。如果有特殊需要，则可以手动删除/controller节点来触发新一轮的选举。当然关闭控制器所对应的broker，以及手动向/controller节点写入新的brokerid的所对应的数据，同样可以触发新一轮选举</p>
+<p>具备控制器身份的broker需要比其他普通的broker多一份职责，具体细节如下:</p>
+<ul>
+<li>监听分区相关的变化。为 ZooKeeper 中的/admin/reassign partitions节点注册 PartitionReassignmentHandler，用来处理分区重分配的动作。为ZooKeeper中的 /Isr_change_notification 节点注册 IsrChangeNotificetionHandler，用来处理 ISR 集合变更的动作. 为ZooKeeper中的/admin/preferred-replica-election节 点添加 PreferredReplicaElectionHandler，用来处理优先副本的选举动作。</li>
+<li>监听主题相关的变化 。为 ZooKeeper 中的 /brokers/topics 节点添加 TopicChangeHandle， 用来处理主题增减变化: 为ZooKeeper 中的/admin/delete topics 节点添加 TopicDeletionHandler，用来处理删除主题的动作。</li>
+<li>监听broker相关的变化。为ZooKeeper中的/brokers/ids节点添加 BrokerChangeHandler, 用来处理broker增减的变化。</li>
+<li>从ZooKeeper中读取获取当前所有与主题、分区及broker有关的信息并进行相应的管理。 对所有主题对应的ZooKeeper中的 /brokers/topics/<topic>节点添加 PartitionModificationsHandler， 用来监听主题中的分区分配变化 。</topic></li>
+<li>启动并管理分区状态机和副本状态机。</li>
+<li>更新集群的元数据信息 。</li>
+<li>如果参数 auto.leader.rebalance.enable 设置为 true，则还会开启一个名为 “auto-leader-rebalance-task” 的定时任务来负责维护分区的优先副本的均衡。</li>
+</ul>
+<h3 id="分区leader的选举"><a href="#分区leader的选举" class="headerlink" title="分区leader的选举"></a>分区leader的选举</h3><p>分区leader副本的选举由控制器负责具体实施。当创建分区或分区上线的时候都需要执行leader的选举动作，对应的选举策略为OfflinePartitionLeaderElectionStrategy。这种策略的基本思路是按照AR集合中副本的顺序查找第一个存货的副本，并且这个副本在ISR集合中。一个分区的AR集合在分配的时候就被指定，并且只要不发生重分配的情况，集合内部副本的顺序是保持不变的，而分区的ISR集合中副本的顺序可能会改变</p>
+<p>如果ISR集合中没有可用的副本，那么此时还要再检查一下所配置的unclean.leader.election.enable参数（默认值为flase）。如果这个参数配置为true，那么表示允许从非ISR列表中选举leader，从AR列表中找到第一个存活的副本即为leader</p>
+<p>当分区进行重分配的时候也需要执行leader的选举动作，对应的选举策略为ReassignPartitionLeaderElectionStrategy。从重分配的AR列表中找到第一个存活的副本，且这个副本在目前的ISR列表中</p>
+<p>当发生优先副本的选举时，直接将优先副本设置为leader即可，AR集合中的第一个副本即为优先副本</p>
+<p>当某节点被优雅地关闭，位于这个节点的leader副本都会下线，需要执行leader的选举。选举策略：从AR列表中找到第一个存活的副本，且这个副本在目前的ISR列表中，与此同时还要确保这个副本部委于正在被关闭的节点上</p>
+
       
     </div>
     
@@ -330,8 +385,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/Kafka/Kafka监控/" rel="next" title="kafka监控">
-                <i class="fa fa-chevron-left"></i> kafka监控
+              <a href="/Kafka/Kakfa日志存储/" rel="next" title="kafka日志存储">
+                <i class="fa fa-chevron-left"></i> kafka日志存储
               </a>
             
           </div>
@@ -340,8 +395,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/Kafka/Kafka应用/" rel="prev" title="kafka应用">
-                kafka应用 <i class="fa fa-chevron-right"></i>
+              <a href="/Kafka/Kafka监控/" rel="prev" title="kafka监控">
+                kafka监控 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -465,7 +520,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#kafka服务端深入"><span class="nav-number">1.</span> <span class="nav-text">kafka服务端深入</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#kafka服务端深入"><span class="nav-number">1.</span> <span class="nav-text">kafka服务端深入</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#协议设计"><span class="nav-number">1.1.</span> <span class="nav-text">协议设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#时间轮"><span class="nav-number">1.2.</span> <span class="nav-text">时间轮</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#延时操作"><span class="nav-number">1.3.</span> <span class="nav-text">延时操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#延时生产"><span class="nav-number">1.3.1.</span> <span class="nav-text">延时生产</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#延时拉取"><span class="nav-number">1.3.2.</span> <span class="nav-text">延时拉取</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#控制器"><span class="nav-number">1.4.</span> <span class="nav-text">控制器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#控制器的选举及异常恢复"><span class="nav-number">1.4.1.</span> <span class="nav-text">控制器的选举及异常恢复</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分区leader的选举"><span class="nav-number">1.4.2.</span> <span class="nav-text">分区leader的选举</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>

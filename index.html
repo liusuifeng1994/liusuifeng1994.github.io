@@ -229,6 +229,223 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://liusuifeng1994.github.io/Kafka/Kafka客户端深入/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Liusuifeng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Liusuifeng's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/Kafka/Kafka客户端深入/" itemprop="url">kafka客户端深入</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-17T13:00:00+08:00">
+                2020-03-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="kafka客户端深入"><a href="#kafka客户端深入" class="headerlink" title="kafka客户端深入"></a>kafka客户端深入</h1><h2 id="分区分配策略"><a href="#分区分配策略" class="headerlink" title="分区分配策略"></a>分区分配策略</h2><p>Kafka提供了消费者客户端参数partition.assignment.strategy来设置消费者与订阅主题之间的分区分配策略。默认情况下，此参数的值为org.apache.kafka.clients.consumer.RangeAssignor，即采用RangeAssignor分配策略</p>
+<h3 id="RangeAssignor分配策略"><a href="#RangeAssignor分配策略" class="headerlink" title="RangeAssignor分配策略"></a>RangeAssignor分配策略</h3><p>RangeAssignor分配策略的原理是按照消费者总数和分区总数进行整除运算来获得一个跨度，然后将分区按照跨度进行平均分配，以保证分区尽可能均匀地分配给所有的消费者。对于每一个主题，RangeAssignor策略会将消费组内所有订阅这个主题的消费者按照名称的字典序排序，然后为每个消费者划分固定的分区范围，如果不够平均分配，那么字典序靠前的消费者会被多分配一个分区</p>
+<p>假设n=分区数/消费者数量，m=分区数%消费者数量，那么前m个消费者每个分配n+1个分区，后面的（消费者数量-m）个消费者每个分配n个分区<br>假设消费组内有2个消费者C0和C1，都订阅了主题t0和t1，并且每个主题都有4个分区，那么订阅的所有分区可以标识为：t0p0、t0p1、t0p2、t0p3、t1p0、t1p1、t1p2、t1p3。最终的分配结果为：<br>消费者C0：t0p0、t0p1、t1p0、t1p1<br>消费者C1：t0p2、t0p3、t1p2、t1p3</p>
+<p>假设2个主题都只有3个分区，那么订阅的所有分区可以标识为：t0p0、t0p1、t0p2、t1p0、t1p1、t1p2。最终的分配结果为：<br>消费者C0：t0p0、t0p1、t1p0、t1p1<br>消费者C1：t0p2、t1p2</p>
+<h3 id="RoundRobinAssignor分配策略"><a href="#RoundRobinAssignor分配策略" class="headerlink" title="RoundRobinAssignor分配策略"></a>RoundRobinAssignor分配策略</h3><p>RoundRobinAssignor分配策略的原理是将消费组内所有消费者及消费者订阅的所有主题的分区按照字典序排序，然后通过轮询方式逐个将分区一次分配给每个向消费者。RoundRobinAssignor分配策略对应的partition.assignment.strategy参数值为org.apache.kafka.clients.consumer.RoundRobinAssignor</p>
+<p>如果同一个消费组内所有的消费者的订阅信息都是相同的，那么RoundRobinAssignor分配策略的分区分配会是均匀的</p>
+<p>假设消费组内有2个消费者C0和C1，都订阅了主题t0和t1，并且每个主题都有3个分区，那么订阅的所有分区可以表示为：t0p0、t0p1、t0p2、t1p0、t1p1、t1p2。最终分配结果为：<br>消费者C0：t0p0、t0p2、t1p1<br>消费者C1：t0p1、t1p0、t1p2</p>
+<p>如果同一个消费组内的消费者订阅的信息不是相同的，那么在执行分区分配的时候就不是完全的轮询分配，有可能导致分区分配得不均匀<br>假设消费组内有3个消费者（C0、C1和C2），它们共订阅了3个主题（t0、t1和t2），这3个主题分别有1、2、3个分区，即整个消费组订阅了t0p0、t1p0、t1p1、t2p0、t2p1、t2p2这6个分区，消费者C0订阅了主题t0，消费者C1订阅的是主题t0和t1，消费者C2订阅的是主题t0、t1和t2，那么最终的分配结果是：<br>消费者C0：t0p0<br>消费者C1：t1p0<br>消费者C2：t1p1、t2p0、t2p1、t2p2</p>
+<h3 id="StickyAssignor分配策略"><a href="#StickyAssignor分配策略" class="headerlink" title="StickyAssignor分配策略"></a>StickyAssignor分配策略</h3><p>引入这个策略主要有两个目的：<br>    分区的分配要尽可能均匀<br>    分区的分配尽可能与上次分配的保持相同<br>当两者发生冲突时，第一个目标优先于第二个目标</p>
+<p>假设消费组内有3个消费者（C0、C1和C2），它们都订阅了4个主题（t0、t1、t2、t3），并且每个主题有2个分区。也就是说，整个消费组订阅了t0p0、t0p1、t1p0、t1p1、t2p0、t2p1、t3p0、t3p1这8个分区。最终的分配结果如下：<br>消费者C0：t0p0、t1p1、t3p0<br>消费者C1：t0p1、t2p0、t3p1<br>消费者C2：t1p0、t2p1</p>
+<p>和RoundRobinAssignor分配策略所分配的结果相同，假设此时消费者C1脱离了消费组，那么消费组就会执行再均衡操作， 进而消费分区会重新分配。如果采用RoundRobinAssignor分配策略，那么此时的分配结果如下：<br>消费者C0：t0p0、t1p0、t2p0、t3p0<br>消费者C2：t0p1、t1p1、t2p1、t3p1</p>
+<p>RoundRobinAssignor分配策略会按照消费者C0和C2进行重新轮询分配。如果使用的是StickyAssignor分配策略，分配结果为：<br>消费者C0：t0p0、t1p1、t3p0、t2p0<br>消费者C2：t1p0、t2p1、t0p1、t3p1</p>
+<p>分配结果中保留了上一次分配中对消费者C0和C2的所有分配结果，并将原来消费者C1的负担分配给了剩余的两个消费者C0和C2，最终C0和C2的分配还保持了均衡</p>
+<p>StickyAssignor分配策略尽可能地让前后两次分配相同，进而减少系统资源的损耗及其他异常情况的发生<br>假设消费组内有3个消费者（C0、C1和C2），它们共订阅了3个主题（t0、t1和t2），这3个主题分别有1、2、3个分区，即整个消费组订阅了t0p0、t1p0、t1p1、t2p0、t2p1、t2p2这6个分区，消费者C0订阅了主题t0，消费者C1订阅的是主题t0和t1，消费者C2订阅的是主题t0、t1和t2，那么最终的分配结果是<br>消费者C0：t0p0<br>消费者C1：t1p0、t1p1<br>消费者C2：t2p0、t2p1、t2p2</p>
+<h3 id="自定义分区分配策略"><a href="#自定义分区分配策略" class="headerlink" title="自定义分区分配策略"></a>自定义分区分配策略</h3><p>自定义的分配策略必须要实现org.apache.kafka.clients.consumer.internals.PartitionAssignor接口</p>
+<p>PartitionAssignor接口中定义了两个内部类：Subscription和Assignment<br>Subscription类用来表示消费者的订阅信息，类中有两个属性：topics和userData，分别表示消费者的订阅主题列表和用户自定义信息<br>Assignment类用来表示分配结果信息，类中也有两个属性：partitions和userData，分别表示所分配到的分区集合和用户自定义的数据<br>onAssignment()方法是在每个消费者收到消费组leader分配结果时的回调函数<br>name()方法用来提供分配策略的名称，自定义的分配策略要注意命名不要与已存在的分配策略发生冲突<br>真正的分区分配方案的实现是在assign()方法中，方法中的参数metadata表示集群的元数据信息，而subscriptions表示消费组内各个消费者成员的订阅信息，最终方法返回各个消费者的分配信息</p>
+<h2 id="消费者协调器和组协调器"><a href="#消费者协调器和组协调器" class="headerlink" title="消费者协调器和组协调器"></a>消费者协调器和组协调器</h2><h3 id="再均衡的原理"><a href="#再均衡的原理" class="headerlink" title="再均衡的原理"></a>再均衡的原理</h3><p>消费者客户端将全部消费者组分成多个子集，每个消费组的子集在服务端对应一个GroupCoordinator对其进行管理，GroupCoordinator是Kafka服务端中用于管理消费组的组件。而消费者客户端中的ConsumerCoordinator组件负责与GroupCoordinator进行交互。<br>ConsumerCoordinator与GroupCoordinator之间最重要的职责就是负责执行消费者再均衡的操作，包括分区分配的工作也是在再均衡期间完成的</p>
+<p>当有消费者加入消费组时，消费者、消费组及组协调器之间会经历一下几个阶段<br><strong>第一阶段（FIND_COORDINATOR）</strong><br>消费者需要确定它所属的消费组对应的GroupCoordinator所在的broker，并创建与该broker相互通信的网络连接。如果消费者已经保存了与消费组对应的GroupCoordinator节点的信息，并且与它之间的网络连接是正常的，那么就可以进入第二阶段。否则，就需要向集群中的负载最小的节点发送FindCoordinatorRequest请求来查找对应的GroupCoordinator</p>
+<p>FindCoordinatorRequest请求体中只有两个域：coordinator_key和coordinator_type。coordinator_key是消费组的名称，即groupId，coordinator_type置为0<br><img src="/media/15843273229031.jpg" alt="-w833"></p>
+<p>Kafka在收到FindCoordinatorRequest请求之后，会根据coordinator_key查找对应的GroupCoordinator节点，找到对应的GroupCoordinator则会返回其相应的nod_id、host和port信息</p>
+<p><strong>第二阶段（JOIN_GROUP）</strong><br>在成功找到消费组所对应的GroupCoordinator之后就进入加入消费组的阶段，在此阶段的消费者会向GroupCoordinator发送JoinGroupRequest请求，并处理响应<br><img src="/media/15843273748546.jpg" alt="-w822"></p>
+<p>joinGroupRequest的结构包含多个域：</p>
+<ul>
+<li>group_id就是消费组的id</li>
+<li>session_timeout对应消费端参数session.timeout.ms，默认值为10000，即10秒。GroupCoordinator超过session_timeout指定的时间内没有收到心跳报文则认为此消费者已经下线</li>
+<li>rebalance_timeout对应消费端参数max.poll.interval.ms，默认值为300000，即5分钟。表示当下消费组再均衡的时候，GroupCoordinator等待各个消费者重新加入的最长等待时间</li>
+<li>member_id表示GroupCoordinator分配给消费者的id标识。消费者第一次发送JoinGroupRequest请求的时候此字段设置为null</li>
+<li>protocol_type表示消费组实现的协议，对于此消费者而言此字段值为consumer</li>
+</ul>
+<p>JoinGroupRequest中的group_protocols域为数组类型，其中可以囊括多个分区分配策略，主要取决于消费者客户端参数partition.assignment.strategy的配置。如果配置了多种策略，那么JoinGroupRequest中就会包含多个protocol_name和protocol_metadata</p>
+<p>消费者在发送JoinGroupRequest请求之后会阻塞等待Kafka服务端的响应。服务端在收到JoinGroupRequest请求后会交由GroupCoordinator来进行处理。GroupCoordinator首先会对JoinGroupRequest请求做合法性校验。如果消费者是第一次请求加入消费组，那么JoinGroupRequest请求中的member_id值为null，此时组协调器负责为此消费者生成一个member_id（clientId+”-“+UUID）</p>
+<p>1）选举消费组的leader<br>GroupCoordinator需要为消费组内的消费者选举出一个消费组的leader。如果消费组内还没有leader，那么第一个加入消费组的消费者即为消费组的leader。如果某一时刻leader消费者退出了消费组，那么会重新选举一个新的leader。在GroupCoordinator中消费者的信息是以HashMap的形式存储的，其中key为消费者的member_id，而value是消费者相关的元数据信息。leaderId表示leader消费者的member_id，它的取值为HashMap中的第一个键值对的key</p>
+<p>2）选举分区分配策略<br>分区分配的选举并非由leader消费者决定，而是根据消费组内的各个消费者投票来决定<br>A.收集各个消费者支持的所有分配策略，组成候选集candidates<br>B.每个消费者从候选集candidates中找出第一个自身支持的策略，为这个策略投上一票<br>C.计算候选集中各个策略的选票数，选票数最多的策略即为当前消费组的分配策略</p>
+<p>消费者所支持的分配策略是partition.assignment.strategy参数配置的策略<br>在此之后，Kafka服务端就要发送JoinGroupResponse响应给各个消费者，JoinGroupResponse中包含GroupCoordinator中投票选举出的分配策略的信息。并且，只有leader消费者的JoinGroupResponse中包含各个消费者的订阅信息。Kafka把分区策略的具体分配交还给客户端，自身并不参与具体的分配细节，这样即使以后分区分配的策略发生了变更，只需要重启消费端的应用即可，而不需要重启服务端</p>
+<p><img src="/media/15843277236078.jpg" alt="-w469"></p>
+<p><img src="/media/15843277377271.jpg" alt="-w453"></p>
+<p><strong>第三阶段（SYNC_GROUP）</strong><br>在第三个阶段，也就是同步阶段，各个消费者GroupCoordinator发送SyncGroupRequest请求来同步分配方案<br><img src="/media/15843278063361.jpg" alt="-w469"></p>
+<p>GroupCoordinator会先对SyncGroupRequest请求做合法性校验，在此之后会将从leader消费者发送过来的分配方案提取出来，连同整个消费组的元数据信息一起存入Kafka的__consumer_offsets主题中，最后发送SyncGroupResponse给各个消费者各自所属的分配方案</p>
+<p>当消费者收到所属的分配方案之后会调用PartitionAssignor中的onAssignment()方法。随后再调用ConsumerRebalanceListener中的onPartitionsAssigned()方法。之后开启心跳任务，消费者定期向服务端的GroupCoordinator发送HeartBeatRequest来确定彼此在线</p>
+<p><strong>第四阶段（HEARTBEAT）</strong><br>消费组中的所有消费者处于正常工作状态。在正式消费之前，消费者还需要确定拉取消息的起始位置。假设之前已经将最后的消费位移提交到了GroupCoordinator，并且GroupCoordinator将其保存到了Kafka内部的__consumer_offsets主题中，此时消费者可以通过OffsetFetchRequest请求获取上次提交的消费位移并从此处继续消费</p>
+<p>消费者通过向GroupCoordinator发送心跳来维持它们与消费组的从属关系，以及它们对分区的所有权关系。只要消费者以正常的时间间隔发送心跳，就被认为是活跃的，说明它还在读取分区中的消息。心跳线程是一个独立的线程，可以在轮询消息的空档发送心跳。如果消费者停止发送心跳的时间足够长，则整个会话被判定为过期，GroupCoordinator也会认为这个消费者已经死亡，就会触发一次再均衡行为</p>
+<h2 id="事务与幂等"><a href="#事务与幂等" class="headerlink" title="事务与幂等"></a>事务与幂等</h2><h3 id="消息传输保障"><a href="#消息传输保障" class="headerlink" title="消息传输保障"></a>消息传输保障</h3><p>消息中间件的消息传输保障有3个层级：</p>
+<ul>
+<li>at most once：至多一次。消息可能会丢失，但绝对不会重复传输</li>
+<li>at least once：最少一次。消息绝不会丢失，但可能会重复传输</li>
+<li>exactly once：恰好一次。每条消息肯定会被传输一次且仅传输一次</li>
+</ul>
+<h3 id="幂等"><a href="#幂等" class="headerlink" title="幂等"></a>幂等</h3><p>幂等是指对接口的多次调用所产生的结果和调用一次是一致的。生产者在进行重试的时候有可能会重复写入消息，而使用Kafka的幂等性功能之后就可以避免这种情况</p>
+<p>开启幂等性功能需要显示地将生产者客户端参数enable.idempotence设置为true即可（这个参数默认值为false）<br><code>props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);</code></p>
+<p>如果要确保幂等性功能正常，需要确保生产者客户端的retries、acks、max.in.flight.requests.per.connection这几个参数不被配置错。在使用幂等性功能的时候，用户完全不需要配置这几个参数</p>
+<p>如果用户显示指定了retries参数，那么这个参数的值必须大于0，如果没有显示指定retries参数，那么KafkaProducer会将它置为Integer.MAX_VALUE。同时还要保证max.in.flight.requests.per.connection（限制每个连接最多缓存的请求数）参数的值不能大于5，acks参数的值为-1</p>
+<p>为了实现生产者的幂等性，Kafka为此引入了producer id（PID）和序列号这两个概念。每个新的生产者实例在初始化的时候都会被分配一个PID，这个PID对用户而言是完全透明的。对于每个PID，消息发送到的每一个分区都有对应的序列号，这些序列号从0开始单调递增。生产者每发送一条消息就会将&lt;PID，分区&gt;对应的序列号的值加1</p>
+<p>broker端会在内存中为每一对&lt;PID，分区&gt;维护一个序列号。对于收到的每一条消息，只有当它的序列号的值比broker端中维护的对应的序列号的值大1（即SN_new=SN_old+1）时，broker才会接收它。如果SN_new&lt;SN_old+1，那么说明消息被重复写入，broker可以直接将其丢弃。如果SN_new&gt;SN_old+1，那么说明中间有数据尚未写入，出现了乱序，可能有消息丢失，对应的生产者会抛出OutOfOrderSequenceException</p>
+<p>引入序列号来实现幂等性只是针对每一对&lt;PID，分区&gt;而言的，也就是说，Kafka的幂等性只能保证单个生产者会话中单分区的幂等</p>
+<h3 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h3><p>事务可以保证对多个分区写入操作的原子性。Kafka中的事务可以使应用程序将消费消息、生产消息、提交消费位移当作原子操作来处理，同时成功或失败，即使该生产或消费会跨多个分区</p>
+<p>为了实现事务，应用程序必须提供唯一的transactionId，这个transactionId通过客户端参数transactional.id来显示指定<br><code>props.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, &quot;transactionId&quot;);</code></p>
+<p>事务要求生产者开启幂等特性，因此通过将transactional.id参数设置为非空从而开启事务特性的同时需要将enable.idempotence设置为true（如果未显示指定，则KafkaProducer默认会将它的值设置为true）</p>
+<p>transactionId与PID一一对应，两者之间所不同的是transactionId由用户显示指定，而PID是由Kafka内部分配的。另外，为了保证新的生产者启动后具有相同transactionId的旧生产者能够立即失效，每个生产者通过transactionId获取PID的同时，还会获取一个单调递增的producer epoch。如果使用同一个transactionId开启两个生产者，那么前一个开启的生产者会报错</p>
+<p>从生产者的角度分析，通过事务，Kafka可以保证跨生产者会话的消息幂等发送，以及跨生产者会话的事务恢复。前者表示具有相同transactionId的新生产者实例被创建且工作的时候，旧的且拥有相同transactionId的生产者实例将不再工作。后者指当某个生产者实例宕机后，新的生产者实例可以保证任何未完成的旧事物要么被提交，要么被中止，如此可以是新的生产者实例从一个正常的状态开始工作</p>
+<p>从消费者的角度分析，Kafka并不能保证已提交的事务中的所有消息都能够被消费：</p>
+<ul>
+<li>对采用日志压缩策略的主题而言，事务中的某些消息有可能被清理（相同key的消息，后写入的消息会覆盖前面写入的消息）</li>
+<li>事务中消息可能分布在同一个分区的多个日志分段中，当老的日志分段被删除时，对应的消息可能会丢失</li>
+<li>消费者可以通过seek()方法访问任意offset的消息，从而可能遗漏事务中的部分消息</li>
+<li>消费者在消费时可能没有分配到事务内的所有分区，如此它也就不能读取事务中的所有消息</li>
+</ul>
+<p>KafkaProducer提供了5个与事务相关的方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">//初始化事务</span><br><span class="line">void initTransactions()</span><br><span class="line">//开启事务</span><br><span class="line">void beginTransaction() throws ProducerFencedException</span><br><span class="line">//消费者在事务内的位移提交</span><br><span class="line">void sendOffsetsToTransaction(Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets,</span><br><span class="line">							  String consumerGroupId) throws ProducerFencedException</span><br><span class="line">//提交事务							  </span><br><span class="line">void commitTransaction() throws ProducerFencedException</span><br><span class="line">//中止事务</span><br><span class="line">void abortTransaction() throws ProducerFencedException</span><br></pre></td></tr></table></figure>
+<p>事务发送事例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">Properties props = new Properties();</span><br><span class="line">props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList);</span><br><span class="line">props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());</span><br><span class="line">props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());</span><br><span class="line">props.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, transactionId);</span><br><span class="line">KafkaProducer&lt;String, String&gt; producer = new KafkaProducer&lt;&gt;(props);</span><br><span class="line">producer.initTransactions();</span><br><span class="line">producer.beginTransaction();</span><br><span class="line">try &#123;</span><br><span class="line">    ProducerRecord&lt;String, String&gt; record1 = new ProducerRecord&lt;&gt;(topic, &quot;msg1&quot;);</span><br><span class="line">    producer.send(record1);</span><br><span class="line">    ProducerRecord&lt;String, String&gt; record2 = new ProducerRecord&lt;&gt;(topic, &quot;msg2&quot;);</span><br><span class="line">    producer.send(record2);</span><br><span class="line">    producer.commitTransaction();</span><br><span class="line">&#125; catch (ProducerFencedException e) &#123;</span><br><span class="line">    producer.abortTransaction();</span><br><span class="line">&#125; finally &#123;</span><br><span class="line">    producer.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在消费端有一个参数isolation.level，默认值为read_uncommitted，意思是说消费端应用可以消费到未提交的事务。还可以设置为read_committed，表示消费端应用只能看到提交的事务<br><img src="/media/15843282888371.jpg" alt="-w660"><br>日志文件中除了普通的消息，还有一种消息专门用来标志一个事务的结束，它就是控制消息（ControlBatch）。控制消息一共有两种类型：COMMIT和ABORT，分别用来表征事务已经成功提交或已经被成功中止。KafkaConsumer可以通过这个控制消息来判断对应的事务是被提交了还是被中止了，然后结合参数isolation.level配置的隔离级别来决定是否将相应的消息返回给消费端应用</p>
+<p>consume-transform-produce（消费-转换-生产）示例：<br><img src="/media/15843283068631.jpg" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line">@RunWith(SpringRunner.class)</span><br><span class="line">@SpringBootTest</span><br><span class="line">public class TransactionConsumerTransformProduceTest &#123;</span><br><span class="line">    public static final String brokerList = &quot;192.168.126.158:9092&quot;;</span><br><span class="line"></span><br><span class="line">    public Properties getConsumerProperties() &#123;</span><br><span class="line">        Properties props = new Properties();</span><br><span class="line">        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList);</span><br><span class="line">        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());</span><br><span class="line">        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());</span><br><span class="line">        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);</span><br><span class="line">        props.put(ConsumerConfig.GROUP_ID_CONFIG, &quot;groupId&quot;);</span><br><span class="line">        return props;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public Properties getProducerProperties() &#123;</span><br><span class="line">        Properties props = new Properties();</span><br><span class="line">        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList);</span><br><span class="line">        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());</span><br><span class="line">        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());</span><br><span class="line">        props.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, &quot;transactionId&quot;);</span><br><span class="line">        return props;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Test</span><br><span class="line">    public void consumerTransformProduceTest() &#123;</span><br><span class="line">        //初始化生产者和消费者</span><br><span class="line">        KafkaConsumer&lt;String, String&gt; consumer = new KafkaConsumer&lt;&gt;(getConsumerProperties());</span><br><span class="line">        consumer.subscribe(Collections.singleton(&quot;topic-source&quot;));</span><br><span class="line">        KafkaProducer&lt;String, String&gt; producer = new KafkaProducer&lt;&gt;(getProducerProperties());</span><br><span class="line">        //初始化事务</span><br><span class="line">        producer.initTransactions();</span><br><span class="line">        while (true) &#123;</span><br><span class="line">            ConsumerRecords&lt;String, String&gt; records = consumer.poll(Duration.ofMillis(1000));</span><br><span class="line">            if (!records.isEmpty()) &#123;</span><br><span class="line">                Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets = new HashMap&lt;&gt;();</span><br><span class="line">                //开启事务</span><br><span class="line">                producer.beginTransaction();</span><br><span class="line">                try &#123;</span><br><span class="line">                    for (TopicPartition partition : records.partitions()) &#123;</span><br><span class="line">                        List&lt;ConsumerRecord&lt;String, String&gt;&gt; partitionRecords = records.records(partition);</span><br><span class="line">                        for (ConsumerRecord&lt;String, String&gt; record : partitionRecords) &#123;</span><br><span class="line">                            System.out.println(&quot;topic=&quot; + record.topic() + &quot;,partition=&quot; + record.partition() + &quot;,offset=&quot; + record.offset());</span><br><span class="line">                            System.out.println(&quot;key=&quot; + record.key() + &quot;,value=&quot; + record.value());</span><br><span class="line">                            ProducerRecord&lt;String, String&gt; producerRecord = new ProducerRecord&lt;&gt;(&quot;topic-sink&quot;, record.key(), record.value());</span><br><span class="line">                            //消费-生产模型</span><br><span class="line">                            producer.send(producerRecord);</span><br><span class="line">                        &#125;</span><br><span class="line">                        long lastConsumedOffset = partitionRecords.get(partitionRecords.size() - 1).offset();</span><br><span class="line">                        offsets.put(partition, new OffsetAndMetadata(lastConsumedOffset + 1));</span><br><span class="line">                    &#125;</span><br><span class="line">                    //提交消费位移</span><br><span class="line">                    producer.sendOffsetsToTransaction(offsets, &quot;groupId&quot;);</span><br><span class="line">                    //提交事务</span><br><span class="line">                    producer.commitTransaction();</span><br><span class="line">                &#125; catch (ProducerFencedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                    producer.abortTransaction();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>为了实现事务的功能，Kafka引入了事务协调器（TransactionCoordinator）。每一个生产者都会被指派一个特定的TransactionCoordinator，所有的事务逻辑包括分派PID等都是由TransactionCoordinator来负责实施的。TransactionCoordinator会将事务状态持久化到内部主题__transaction_state中</p>
+<p>以consume-transform-produce的流程为例分析Kafka事务的实现原理<br><img src="/media/15843283944359.jpg" alt="-w763"></p>
+<h4 id="1）查找TransactionCoordinator"><a href="#1）查找TransactionCoordinator" class="headerlink" title="1）查找TransactionCoordinator"></a>1）查找TransactionCoordinator</h4><p>生产者向Kafka发送FindCoordinatorRequest请求，Kafka在收到FindCoordinatorRequest请求之后，会根据coordinator_key（transactionId）查找对应的TransactionCoordinator节点。如果找到，则会返回其相应的node_id、host和port信息。具体查找TransactionCoordinator的方式是根据transactionId的哈希值计算主题__transaction_state中的分区编号，找到对应的分区之后，再寻找此分区leader副本所在的broker节点，该broker节点即为transactionId对应的TransactionCoordinator节点</p>
+<h4 id="获取PID"><a href="#获取PID" class="headerlink" title="获取PID"></a>获取PID</h4><p><img src="/media/15843284515676.jpg" alt=""><br>在找到TransactionCoordinator节点之后，需要为当前生产者分配一个PID。凡是开启了幂等性功能的生产者都必须执行这个操作，不需要考虑该生产者是否还开启了事务。生产者获取PID的操作是通过InitProducerIdRequest请求来实现的，InitProducerIdRequest请求体结构如上图所示，其中transactional_id表示事务的transactionId，transaction_timeout_ms表示TransactionCoordinator等待事务状态更新的超时时间，通过生产者客户端参数transaction.timeout.ms配置，默认值为60000<br><img src="/media/15843284983945.jpg" alt="-w592"></p>
+<p>生产者的InitProducerIdRequest请求会被发送给TransactionCoordinator。如果没开启事务特性而只开启幂等特性，那么InitProducerIdRequest请求可以发送给任意的broker。当TransactionCoordinator第一次收到包含该transactionId的InitProducerIdRequest请求时，它会把transactionId和对应的PID以消息（事务日志消息）的形式保存到主题__transaction_state中，如上图所示。这样可以保证&lt;transactionId,PID&gt;的对应关系被持久化，从而保证即使TransactionCoordinator宕机该对应关系也不会丢失</p>
+<p>其中transaction_status包含Empty(0)、Ongoing（1）、PrepareCommit(2)、PrepareAbort(3)、CompleteCommit(4)、CompleteAbort(5)、Dead(6)这几种状态。在存入主题__transaction_state之前，事务日志消息同样会根据单独的transactionId来计算要发送的分区<br><img src="/media/15843285202365.jpg" alt=""></p>
+<p>initProducerIdRequest对应的InitProducerIdResponse响应体结构如上图所示，除了返回PID，还会触发执行以下任务：</p>
+<ul>
+<li>增加该PID对应的producer_epoch。具有相同PID但producer_epoch小于该producer_epoch的其他生产者新开启的事务将被拒绝</li>
+<li>恢复和终止之前的生产者未完成的事务</li>
+</ul>
+<h4 id="3）开启事务"><a href="#3）开启事务" class="headerlink" title="3）开启事务"></a>3）开启事务</h4><p>通过KafkaProducer的beginTransaction()方法可以开启一个事务，调用该方法后，生产者本地会标记已经开启一个新的事务，只有在生产者发送第一条消息之后TransactionCoordinator才会认为该事务已经开启</p>
+<h4 id="4）Consume-Transform-Produce"><a href="#4）Consume-Transform-Produce" class="headerlink" title="4）Consume-Transform-Produce"></a>4）Consume-Transform-Produce</h4><p>这个阶段囊括了整个事务的数据处理过程</p>
+<p><strong>AddPartitionsToTxnRequest</strong><br>当生产者给一个新的分区（TopicPartition）发送数据前，它需要先向TransactionCoordinator发送AddPartitionsToTxnRequest请求，这个请求会让TransactionCoordinator将&lt;transactionId,TopicPartition&gt;的对应关系存储在主题__transaction_state中，有了这个对照关系在后续的步骤中为每个分区设置COMMIT或ABORT标记<br>如果该分区是对应事务中的第一个分区，那么此时TransactionCoordinator还会启动对该事务的计时</p>
+<p><strong>ProduceRequest</strong><br>生产者通过ProduceRequest请求发送消息（ProducerBatch）到用户自定义主题中，和普通消息不同的是ProducerBatch中会包含实质的PID、producer_epoch和sequence number</p>
+<p><strong>AddOffsetsToTxnRequest</strong><br>通过KafkaProducer的sendOffsetsToTransaction()方法可以在一个事务批次里处理消息的消费和发送，方法中包含2个参数：Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets和String consumerGroupId。这个方法会向TransactionCoordinator节点发送AddOffsetsToTxnRequest请求。TransactionCoordinator收到这个请求之后会通过groupId来推导出在<strong>consumer_offsets中的分区，之后TransactionCoordinator会将整个分区保存在</strong>transaction_state中</p>
+<p><strong>TxnOffsetCommitRequest</strong><br>这个请求也是sendOffsetsToTransaction()方法中的一部分，在处理完AddOffsetsToTxnRequest之后，生产者还会发送TxnOffsetCommitRequest请求给GroupCoordinator，从而将本次事务中包含的消费位移信息offsets存储到主题__consumer_offsets中</p>
+<h4 id="5）提交或者中止事务"><a href="#5）提交或者中止事务" class="headerlink" title="5）提交或者中止事务"></a>5）提交或者中止事务</h4><p><strong>EndTxnRequest</strong><br>无论调用commitTransaction()方法还是abortTransaction()方法，生产者都会向TransactionCoordinator发送EndTxnRequest请求，以此来通知它提交事务还是中止事务<br>TransactionCoordinator在收到EndTxnRequest请求之后会执行如下操作：</p>
+<ul>
+<li>A.将PREPARE_COMMIT或PREPARE_ABORT消息写入主题__transaction_state</li>
+<li>B.通过WriteTxnMarkersRequest请求将COMMIT或ABORT信息写入用户所使用的普通主题和__consumer_offsets</li>
+<li>C.将COMPLETE_COMMIT或COMPLETE_ABORT信息写入内部主题__transaction_state</li>
+</ul>
+<p><strong>WriteTxnMarkersRequest</strong><br>WriteTxnMarkersRequest请求是由TransactionCoordinator发向事务中各个分区的leader节点的，当节点收到这个请求之后，会在相应的分区中写入控制消息（ControlBatch）。控制消息用来标识事务的终结，它和普通的消息一样存储在日志文件中。RecordBatch中attributes字段的第6位用来标识当前消息是否是控制消息<br><img src="/media/15843286447750.jpg" alt=""><br>attributes字段中的第5位用来标识当前消息是否处于事务中<br><img src="/media/15843287094227.jpg" alt=""><br>控制消息的key和value内部的version值都为0，key中的type表示控制类型：0表示ABORT，1表示COMMIT；value中的coordinator_epoch表示TransactionCoordinator的纪元，TransactionCoordinator切换的时候会更新其值</p>
+<p><strong>写入最终的COMPLETE_COMMIT或COMPLETE_ABORT</strong><br>TransactionCoordinator将最终的COMPLETE_COMMIT或COMPLETE_ABORT信息写入主题<strong>transaction_state以表明当前事务已经结束，此时可以删除主题</strong>transaction_state中所有关于该事务的消息。由于主题__transaction_state采用的日志清理策略为日志压缩，所以这里的删除只需要将相应的消息设置为墓碑消息即可</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://liusuifeng1994.github.io/Kafka/Kafka可靠性探究/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -301,125 +518,6 @@
         
           
             <h1 id="kafka可靠性探究"><a href="#kafka可靠性探究" class="headerlink" title="kafka可靠性探究"></a>kafka可靠性探究</h1>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://liusuifeng1994.github.io/Kafka/Kafka客户端深入/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Liusuifeng">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Liusuifeng's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/Kafka/Kafka客户端深入/" itemprop="url">kafka客户端深入</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-16T13:00:00+08:00">
-                2020-03-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="kafka客户端深入"><a href="#kafka客户端深入" class="headerlink" title="kafka客户端深入"></a>kafka客户端深入</h1>
           
         
       
@@ -586,125 +684,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://liusuifeng1994.github.io/Kafka/Kafka服务端深入/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Liusuifeng">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Liusuifeng's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/Kafka/Kafka服务端深入/" itemprop="url">kafka服务端深入</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-16T13:00:00+08:00">
-                2020-03-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="kafka服务端深入"><a href="#kafka服务端深入" class="headerlink" title="kafka服务端深入"></a>kafka服务端深入</h1>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://liusuifeng1994.github.io/Kafka/Kafka监控/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -777,6 +756,172 @@
         
           
             <h1 id="kafka监控"><a href="#kafka监控" class="headerlink" title="kafka监控"></a>kafka监控</h1>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://liusuifeng1994.github.io/Kafka/Kafka服务端深入/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Liusuifeng">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Liusuifeng's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/Kafka/Kafka服务端深入/" itemprop="url">kafka服务端深入</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-16T13:00:00+08:00">
+                2020-03-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="kafka服务端深入"><a href="#kafka服务端深入" class="headerlink" title="kafka服务端深入"></a>kafka服务端深入</h1><h2 id="协议设计"><a href="#协议设计" class="headerlink" title="协议设计"></a>协议设计</h2><p>Kafka自定义了一组基于TCP的二进制协议，只要遵守这组协议的格式，就可以向Kafka发送消息，也可以从中拉取消息。在Kafka2.0.0中，一共包含了43种协议类型，每种协议类型都有对应的请求和响应，它们都遵循特定的协议模式。每种类型的Rquest都包含相同结构的协议请求头和不同结构的协议请求体<br><img src="/media/15843253500633.jpg" alt=""></p>
+<p>协议请求头中包含4个域：api_key、api_version、correlation_id和client_id<br><img src="/media/15843253727598.jpg" alt=""><br>每种类型的Response也包含相同结构的协议响应头和不同结构的响应体<br><img src="/media/15843254014287.jpg" alt=""><br>协议响应头中只有一个correlation_id</p>
+<h2 id="时间轮"><a href="#时间轮" class="headerlink" title="时间轮"></a>时间轮</h2><p>Kafka的延时操作是基于时间轮的概念自定义实现了一个用于延时功能的定时器。JDK中Timer和DelayQueue的插入和删除操作的平均时间复杂度为O(nlogn)，而基于时间轮可以将插入和删除操作的时间复杂度都降为O(1)<br>Kafka中的时间轮是一个存储定时任务的环形队列，底层采用数组实现，数组中的每个元素都可以存放一个定时任务列表（TimerTaskList）。TimerTaskList是一个环形的双向链表，链表中的每一项表示的都是定时任务项，其中封装了真正的定时任务</p>
+<p>时间轮由多个时间格组成，每个时间格代表当前时间轮的基本时间跨度（tickMs）。时间轮的时间格个数是固定的，可用wheelSize来表示，那么整个时间轮的总体时间跨度（interval）可以通过公式tickMs*wheelSize计算得出。时间轮还有一个表盘指针（currentTime），用来表示时间轮当前所处的时间，currentTime是tickMs的整数倍。currentTime可以将整个时间轮划分为到期部分和未到期部分，currentTime当前指向的时间格也属于到期部分，表示刚到到期，需要处理此时间格所对应的TimerTaskList中的所有任务<br><img src="/media/15843256512136.jpg" alt="-w680"><br>若时间轮的tickMs为1ms且wheelSize等于20，可以计算得出总体时间跨度interval为20ms。初始情况下表盘指针currentTime指向时间格0，此时有一个定时为2ms的任务插进来会存放到时间格为2的TimerTaskList中。随着时间推移，指针currentTime不断向前推进，过了2ms之后，当到达时间格2时，就需要将时间格2对应的TimerTaskList中的任务进行相应的到期操作。此时若有一个定时为8ms的任务插进来，则会存放到时间格10中，currentTime再过8ms后会指向时间格10.如果同时有一个定时为19ms的任务插进来，新来的TimerTaskEntry会复用原来的TimerTaskList，所以它会插入原本已经到期的时间格1。整个时间轮的总体跨度是不变的，随着指针currentTime的不断推进，当前时间轮所能处理的时间段也在不断后移，总体时间范围在currentTime和currentTime+interval之间</p>
+<p>Kafka引入了层级时间轮的概念，当任务的到期时间超过了当前时间轮所表示的时间范围时，就会尝试添加到上层时间轮中<br><img src="/media/15843257633814.jpg" alt="-w754"></p>
+<p>上图中，第一层的时间轮tickMs=1ms、wheelSize=20、interval=20ms。第二层的时间轮的tickMs为第一层时间轮的interval，即20ms。每一层时间轮的wheelSize是固定的，都是20，那么第二层的时间轮的总体时间跨度interval为400ms。这个400ms也是第三层的tickMs的大小，第三层的时间轮的总体时间跨度为8000ms</p>
+<p>450ms的定时任务第一层时间轮不能满足条件，所以就升级到第二层时间轮中，第二层时间轮也无法满足条件，所以又升级到第三层时间轮中，最终被插入第三层时间轮中时间格1所对应的TimerTaskList。在到期时间为[400ms,800ms)区间内的多个任务都会被放入第三层时间轮的时间格1，时间格1对应的TimerTaskList的超时时间为400ms。随着时间的推移，当此TimerTaskList到期之时，原本定时为450ms的任务还剩下50ms的时间，还不能执行这个任务的到期操作。这时候会做一个时间轮降级的操作，会将整个剩余时间为50ms的定时任务重新提交到层级时间轮中，此时第一层时间轮的总体时间跨度不够，而第二层足够，所以该任务被放到第二层时间轮到期时间为[40ms,60ms)的时间格中。再经历40ms之后，此时这个任务还剩10ms，还是不能立即执行到期操作。所以还要再有一次时间轮的降级，此任务被添加到第一层时间轮到期时间为[10ms,11ms)的时间格中，之后再经历10ms后，此任务真正到期，最终执行相应的到期操作</p>
+<ul>
+<li>时间轮在创建的时候以当前系统时间为第一层时间轮的起始时间</li>
+<li>时间轮中的每个双向环形链表TimerTaskList都会有一个哨兵节点，作为第一个节点，它的值域不存储任何东西，只是为了操作的方便而引入的</li>
+<li>除了第一层时间轮，其余高层时间轮的起始时间都设置为创建此层时间轮前面第一轮的currentTime。第一层的currentTime都必须是tickMs的整数倍</li>
+<li>Kafka中的定时器只需持有时间轮的第一层时间轮的引用，并不会直接持有其他高层的时间轮，但每一层时间轮都会有一个引用指向更高一层的应用，以此层级调用可以实现定时器间接持有各个层级时间轮的引用</li>
+</ul>
+<p>Kafka中的定时器借用了JDK中的DelayQueue来协助推进时间轮。对于每个使用到的TimerTaskList（费哨兵节点的定时任务项TimerTaskEntry对应的TimerTaskList）都加入DelayQueue。DelayQueue会根据TimerTaskList对应的超时时间expiration来排序，最短expiration的TimerTaskList会被排在DelayQueue的队头。Kafka中会有一个线程（ExpiredOperationReaper）来获取DelayQueue中到期的任务列表。当线程获取DelayQueue中超时的任务列表TimerTaskList之后，即可以根据TimerTaskList的expiration来推进时间轮的时间，也可以就获取的TimerTaskList执行相应的操作，对里面的TimerTaskEntry该执行过期操作的就执行过期操作，该降级时间轮的就降级时间轮</p>
+<p>Kafka中的时间轮专门用来执行插入和删除TimerTaskEntry的操作，而DelayQueue专门负责时间推进的任务</p>
+<p>DelayQueue中第一个超时任务列表的expiration为200ms，第二个超时任务为840ms，这里获取DelayQueue的队头只需要O(1)的时间复杂度（获取之后DelayQueue内部才会再次切换出新的队头）。如果采用每秒定时推进，那么获取第一个超时的任务列表时执行的200次推进中有199次属于空推进，而获取第二个超时任务时有需要执行639次空推进，这样会无故空耗机器的性能资源</p>
+<h2 id="延时操作"><a href="#延时操作" class="headerlink" title="延时操作"></a>延时操作</h2><h3 id="延时生产"><a href="#延时生产" class="headerlink" title="延时生产"></a>延时生产</h3><p>如果在使用生产者客户单发送消息的时候将acks参数设置为-1，那么就意味着需要等待ISR集合中的所有副本都确认收到消息之后才能正确地收到响应的结果，或者捕获超时异常。在将消息写入leader副本的本地日志文件之后，Kafka会创建一个延时的生产操作，用来处理消息正常写入所有副本或超时的情况，以返回相应的响应结果给客户端</p>
+<p>随着follower副本不断地与leader副本进行消息同步，进而促使HW进一步增长，HW每增长一次都会检测是否能够完成此次延时生产操作，如果可以就执行以此返回响应结果给客户端；如果在超时时间内始终无法完成，则强制执行</p>
+<p>延时操作创建之后会被加入延时操作管理器来做专门的处理。延时操作有可能会超时，每个延时操作管理器都会配备一个定时器来做超时管理，定时器的底层就是采用时间轮实现的。时间轮的轮转是靠线程ExpiredOperationReaper来驱动的，这里ExpiredOperationReaper由延时操作管理器启动的。定时器、ExpiredOperationReaper和延时操作管理器都是一一对应的。延时操作需要支持外部事件的触发，所以还要配备一个监听池来负责监听每个分区的外部事件——查看是否有分区的HW发生了增长。ExpiredOperationReaper不仅可以推进时间轮，还会定期清理监听池中已完成的延时操作<br><img src="/media/15843259687986.jpg" alt="-w731"></p>
+<p>如果客户端设置的acks参数不为-1，或者没有成功的消息写入，那么就直接返回结果给客户端，否则就需要创建延时生产操作并存入延时操作管理器，最终要么由外部事件触发，要么超时触发而执行</p>
+<h3 id="延时拉取"><a href="#延时拉取" class="headerlink" title="延时拉取"></a>延时拉取</h3><p>两个follower副本都已经拉取到了leader副本的最新位置，此时又向leader副本发送拉取请求，而leader副本没有新的消息写入，这时Kafka选择了延时操作来处理这种情况。Kafka在处理拉取请求时，会先去读一次日志文件，如果收集不到足够多（fetchMinBytes，由参数fetch.min.bytes配置，默认值为1）的的消息，那么就会创建一个延时拉取操作以等待拉取到足够数量的消息。当延时拉取操作执行时，会再读取一次日志文件，然后将拉取结果返回给follower副本。延时拉取操作也会有一个专门的延时操作管理器负责管理，大体和延时生产相同。如果拉取进度一直没有追赶上leader副本，那么在拉取leader副本的消息时一般拉取的消息大小都会不小于fetchMinBytes，这样Kafka也就不会创建相应的延时拉取操作，而是立即返回拉取结果</p>
+<h2 id="控制器"><a href="#控制器" class="headerlink" title="控制器"></a>控制器</h2><p>在 Kafka 集群中会有一个或多个 broker，其中有一个 broker 会被选举为控制器( Kafka Controller)，它负责管理整个集群中所有分区和副本的状态。当某个分区的 leader 副本出现故 障时，由控制器负责为该分区选举新的 leader副本。当检测到某个分区的 ISR集合发生变化时， 由控制器负责通知所有 broker更新其元数据信息。当使用 kafka-topics.sh 脚本为某个 topic 增加分区数量时，同样还是由控制器负责分区的重新分配 。</p>
+<h3 id="控制器的选举及异常恢复"><a href="#控制器的选举及异常恢复" class="headerlink" title="控制器的选举及异常恢复"></a>控制器的选举及异常恢复</h3><p>Kafka中的控制器选举工作依赖于ZooKeeper，成功竞选为控制器的broker会在ZooKeeper中创建/controller这个临时节点，此临时节点的内容参考如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[zk: localhost:2181(CONNECTED) 0] get /controller</span><br><span class="line">&#123;&quot;version&quot;:1,&quot;brokerid&quot;:1,&quot;timestamp&quot;:&quot;1558621064185&quot;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其中version在目前版本中固定为1，brokerid表示成为控制器的broker的id编号，timestamp表示竞选成为控制器时的时间戳</p>
+<p>在任意时刻，集群中有且仅有一个控制器。每个broker启动的时候会去尝试读取/controller节点的brokerid的值，如果读取到brokerid的值不为-1，则表示已经有其他broker节点成功竞选为控制器，所以当前broker就会放弃竞选；如果ZooKeeper中不存在/controller节点，或者这个节点中的数据异常，那么就会尝试去创建/controller节点。当前broker去创建节点的时候，也有可能其他broker同时去尝试创建这个节点，只有创建成功的那个broker才会成为控制器，而创建失败的broker竞选失败。每个broker都会在内存中保存当前控制器的brokerid值，这个值可以标记为activeControllerId</p>
+<p>ZooKeeper中还有一个与控制器有关的/controller_epoch节点，这个节点是持久节点，节点中存放的是一个整型的controller_epoch值。controller_epoch用于记录控制器发生变更的次数，即记录当前的控制器是第几代控制器，可以称为控制器的纪元</p>
+<p>controller_epoch的初始值为1，当控制器发生变更时，每选出一个新的控制器就将该字段值加1。每个和控制器交互的请求都会携带controller_epoch这个字段，如果请求的controller_epoch值小于内存中的controller_epoch值，则认为这个请求是向已经过期的控制器所发送的请求，被认定为无效请求。如果请求的controller_epoch值大于内存的controller_epoch值，那么说明已经有新的控制器当选了。Kafka通过controller_epoch来保证控制器的唯一性</p>
+<p><img src="/media/15843261766853.jpg" alt="-w631"></p>
+<p>控制器在选举成功之后会读取ZooKeeper中各个节点的数据来初始化上下文信息（ControllerContext），并且需要管理这些上下文信息。不管是监听器触发的事件，还是定时任务触发的事件，或者是其他事件都会读取或更新控制器中的上下文信息，那么就会涉及多线程间的同步。针对这一现象，Kafka的控制器使用单线程基于事件队列的模型，将每个事件都做一层封装，然后按照事件飞升的先后顺序暂存到LinkedBlockingQueue中，最后使用一个专用的线程（ControllerEventThread）按照FIFO的原则顺序处理各个事件，这样不需要锁机制就可以在多线程间维护线程安全</p>
+<p>在目前的新版本的设计中，只有Kafka Controller在ZooKeeper上注册相应的监听器，其他的broker极少需要再监听ZooKeeper中的数据变化。不过每个broker还是会对/controller节点添加监听器，以此来监听此节点的数据变化</p>
+<p>当/controller节点的数据发生变化时，每个broker都会更新自身内存中保存的activeControllerId。如果broker在数据变更前是控制器，在数据变更后自身的brokerid值与新的activeControllerId值不一致，那么就需要退位，关闭相应的资源，比如关闭状态机、注销相应的监听器等。有可能控制器由于异常而下线，造成/controller这个临时节点被自动删除；也有可能是其他原因将此节点删除了</p>
+<p>当/controller节点被删除时，每个broker都会进行选举，如果broker在节点被删除前是控制器，那么在选举前还需要有一个退位的动作。如果有特殊需要，则可以手动删除/controller节点来触发新一轮的选举。当然关闭控制器所对应的broker，以及手动向/controller节点写入新的brokerid的所对应的数据，同样可以触发新一轮选举</p>
+<p>具备控制器身份的broker需要比其他普通的broker多一份职责，具体细节如下:</p>
+<ul>
+<li>监听分区相关的变化。为 ZooKeeper 中的/admin/reassign partitions节点注册 PartitionReassignmentHandler，用来处理分区重分配的动作。为ZooKeeper中的 /Isr_change_notification 节点注册 IsrChangeNotificetionHandler，用来处理 ISR 集合变更的动作. 为ZooKeeper中的/admin/preferred-replica-election节 点添加 PreferredReplicaElectionHandler，用来处理优先副本的选举动作。</li>
+<li>监听主题相关的变化 。为 ZooKeeper 中的 /brokers/topics 节点添加 TopicChangeHandle， 用来处理主题增减变化: 为ZooKeeper 中的/admin/delete topics 节点添加 TopicDeletionHandler，用来处理删除主题的动作。</li>
+<li>监听broker相关的变化。为ZooKeeper中的/brokers/ids节点添加 BrokerChangeHandler, 用来处理broker增减的变化。</li>
+<li>从ZooKeeper中读取获取当前所有与主题、分区及broker有关的信息并进行相应的管理。 对所有主题对应的ZooKeeper中的 /brokers/topics/<topic>节点添加 PartitionModificationsHandler， 用来监听主题中的分区分配变化 。</topic></li>
+<li>启动并管理分区状态机和副本状态机。</li>
+<li>更新集群的元数据信息 。</li>
+<li>如果参数 auto.leader.rebalance.enable 设置为 true，则还会开启一个名为 “auto-leader-rebalance-task” 的定时任务来负责维护分区的优先副本的均衡。</li>
+</ul>
+<h3 id="分区leader的选举"><a href="#分区leader的选举" class="headerlink" title="分区leader的选举"></a>分区leader的选举</h3><p>分区leader副本的选举由控制器负责具体实施。当创建分区或分区上线的时候都需要执行leader的选举动作，对应的选举策略为OfflinePartitionLeaderElectionStrategy。这种策略的基本思路是按照AR集合中副本的顺序查找第一个存货的副本，并且这个副本在ISR集合中。一个分区的AR集合在分配的时候就被指定，并且只要不发生重分配的情况，集合内部副本的顺序是保持不变的，而分区的ISR集合中副本的顺序可能会改变</p>
+<p>如果ISR集合中没有可用的副本，那么此时还要再检查一下所配置的unclean.leader.election.enable参数（默认值为flase）。如果这个参数配置为true，那么表示允许从非ISR列表中选举leader，从AR列表中找到第一个存活的副本即为leader</p>
+<p>当分区进行重分配的时候也需要执行leader的选举动作，对应的选举策略为ReassignPartitionLeaderElectionStrategy。从重分配的AR列表中找到第一个存活的副本，且这个副本在目前的ISR列表中</p>
+<p>当发生优先副本的选举时，直接将优先副本设置为leader即可，AR集合中的第一个副本即为优先副本</p>
+<p>当某节点被优雅地关闭，位于这个节点的leader副本都会下线，需要执行leader的选举。选举策略：从AR列表中找到第一个存活的副本，且这个副本在目前的ISR列表中，与此同时还要确保这个副本部委于正在被关闭的节点上</p>
+
           
         
       
